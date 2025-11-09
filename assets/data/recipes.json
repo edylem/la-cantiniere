@@ -1,0 +1,47 @@
+[
+  {
+    "id": "salade-tomate-feta",
+    "title": "Salade tomate-feta",
+    "image": "assets/images/salade-tomate-feta.jpg",
+    "ingredients": [
+      { "name": "Tomate", "quantity": 3, "unit": "pièce" },
+      { "name": "Feta", "quantity": 150, "unit": "g" },
+      { "name": "Olive", "quantity": 50, "unit": "g" },
+      { "name": "Huile d'olive", "quantity": 30, "unit": "ml" }
+    ],
+    "description": "Salade fraîche et rapide, parfaite pour l'été.",
+    "season": "Été",
+    "prepTime": 10,
+    "cost": 4.5
+  },
+  {
+    "id": "pates-carbonara",
+    "title": "Pâtes à la carbonara",
+    "image": "assets/images/pates-carbonara.jpg",
+    "ingredients": [
+      { "name": "Pâtes sèches", "quantity": 300, "unit": "g" },
+      { "name": "Bacon", "quantity": 150, "unit": "g" },
+      { "name": "Œuf", "quantity": 3, "unit": "pièce" },
+      { "name": "Parmesan", "quantity": 50, "unit": "g" }
+    ],
+    "description": "Classique italien crémeux sans crème.",
+    "season": "Automne",
+    "prepTime": 25,
+    "cost": 6.0
+  },
+  {
+    "id": "soupe-legumes",
+    "title": "Soupe de légumes maison",
+    "image": "assets/images/soupe-legumes.jpg",
+    "ingredients": [
+      { "name": "Carotte", "quantity": 3, "unit": "pièce" },
+      { "name": "Pomme de terre", "quantity": 400, "unit": "g" },
+      { "name": "Poireau", "quantity": 2, "unit": "pièce" },
+      { "name": "Eau", "quantity": 1.5, "unit": "l" }
+    ],
+    "description": "Soupe réconfortante, simple et familiale.",
+    "season": "Hiver",
+    "prepTime": 45,
+    "cost": 3.2
+  }
+]

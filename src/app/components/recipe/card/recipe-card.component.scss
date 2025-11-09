@@ -1,0 +1,29 @@
+.recipe-image {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.recipe-meta {
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.description {
+  margin: 0.5rem 0;
+  color: rgba(0, 0, 0, 0.8);
+  max-height: 4.5rem;
+  overflow: hidden;
+}
+
+.ingredients-count {
+  font-size: 0.9rem;
+  color: #555;
+  margin-top: 0.5rem;
+}
+
+.actions {
+  margin-top: 0.75rem;
+}

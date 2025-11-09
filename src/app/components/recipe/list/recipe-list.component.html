@@ -1,0 +1,25 @@
+<p-toast></p-toast>
+
+<div class="flex align-items-center gap-2 mb-3">
+  <button pButton type="button" label="Charger (fichier)" (click)="onLoadFromFile()"></button>
+  <button
+    pButton
+    type="button"
+    label="Charger exemples"
+    (click)="onLoadExamples()"
+    class="p-button-secondary"
+  ></button>
+  <button
+    pButton
+    type="button"
+    label="Télécharger"
+    (click)="onDownload()"
+    class="p-button-outlined ml-auto"
+  ></button>
+</div>
+
+<div class="grid gap-3">
+  <div *ngFor="let recipe of recipesSignal()" class="col-12 md:col-6 lg:col-4">
+    <app-recipe-card [recipe]="recipe"></app-recipe-card>
+  </div>
+</div>
