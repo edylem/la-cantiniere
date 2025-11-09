@@ -16,6 +16,7 @@ import { Textarea } from 'primeng/textarea';
 import { InputNumber } from 'primeng/inputnumber';
 import { MultiSelect } from 'primeng/multiselect';
 import { Button } from 'primeng/button';
+import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
 import { Fieldset } from 'primeng/fieldset';
 
@@ -30,6 +31,7 @@ import { Fieldset } from 'primeng/fieldset';
     InputNumber,
     MultiSelect,
     Button,
+    Card,
     Dialog,
     Fieldset,
   ],

@@ -12,17 +12,45 @@
   font-weight: 600;
 }
 
+.season {
+  font-weight: normal;
+}
+
+.season-badge {
+  margin-right: 0.25rem;
+  border-radius: 4px;
+  padding: 0.125rem 0.25rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.season-badge.hiver {
+  background-color: #007bff;
+  color: white;
+}
+
+.season-badge.printemps {
+  background-color: #28a745;
+  color: white;
+}
+
+.season-badge.ete {
+  background-color: #ffc107;
+  color: white;
+}
+
+.season-badge.automne {
+  background-color: #fd7e14;
+  color: white;
+}
+
 .description {
   margin: 0.5rem 0;
   color: rgba(0, 0, 0, 0.8);
   max-height: 4.5rem;
   overflow: hidden;
-}
-
-.ingredients-count {
-  font-size: 0.9rem;
-  color: #555;
-  margin-top: 0.5rem;
 }
 
 .actions {

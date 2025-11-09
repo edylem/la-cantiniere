@@ -11,182 +11,182 @@
   "
 >
   <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
-      <div class="grid gap-2">
-        <!-- Titre -->
-        <div class="col-12">
-          <label for="title">Titre *</label>
+    <div class="grid gap-2">
+      <!-- Titre -->
+      <div class="col-12">
+        <label for="title">Titre *</label>
+        <input
+          pInputText
+          id="title"
+          formControlName="title"
+          class="w-full"
+          [disabled]="isReadOnly"
+        />
+      </div>
+
+      <!-- Image -->
+      <div class="col-12">
+        <label>Image</label>
+        <div class="flex gap-2 align-items-center">
+          <p-button
+            *ngIf="!isReadOnly"
+            type="button"
+            label="Sélectionner une image"
+            icon="pi pi-image"
+            [outlined]="true"
+            (click)="fileInput.click()"
+          ></p-button>
           <input
-            pInputText
-            id="title"
-            formControlName="title"
-            class="w-full"
-            [disabled]="isReadOnly"
+            #fileInput
+            type="file"
+            accept="image/*"
+            (change)="onImageSelect($event)"
+            style="display: none"
           />
+          <small *ngIf="recipeForm.get('image')?.value">Image sélectionnée</small>
         </div>
+        <img
+          *ngIf="recipeForm.get('image')?.value"
+          [src]="recipeForm.get('image')?.value"
+          alt="Aperçu de l'image"
+          class="form-image-preview"
+        />
+      </div>
 
-        <!-- Image -->
-        <div class="col-12">
-          <label>Image</label>
-          <div class="flex gap-2 align-items-center">
-            <p-button
-              *ngIf="!isReadOnly"
-              type="button"
-              label="Sélectionner une image"
-              icon="pi pi-image"
-              [outlined]="true"
-              (click)="fileInput.click()"
-            ></p-button>
-            <input
-              #fileInput
-              type="file"
-              accept="image/*"
-              (change)="onImageSelect($event)"
-              style="display: none"
-            />
-            <small *ngIf="recipeForm.get('image')?.value">Image sélectionnée</small>
-          </div>
-          <img
-            *ngIf="recipeForm.get('image')?.value"
-            [src]="recipeForm.get('image')?.value"
-            alt="Aperçu de l'image"
-            class="form-image-preview"
-          />
-        </div>
-
-        <!-- Ingrédients -->
-        <div class="col-12">
-          <p-fieldset legend="Ingrédients">
-            <div formArrayName="ingredients">
-              <div
-                *ngFor="let ingredient of ingredients.controls; let i = index"
-                [formGroupName]="i"
-                class="grid align-items-center"
-                style="gap: 0; margin-bottom: 0rem"
-              >
-                <div class="col-12 md:col-4">
-                  <input
-                    pInputText
-                    formControlName="name"
-                    placeholder="Nom de l'ingrédient *"
-                    class="w-full"
-                    [disabled]="isReadOnly"
-                  />
-                </div>
-                <div class="col-12 md:col-2">
-                  <p-inputnumber
-                    formControlName="quantity"
-                    [min]="0"
-                    placeholder="Quantité *"
-                    class="w-full"
-                    [disabled]="isReadOnly"
-                  ></p-inputnumber>
-                </div>
-                <div class="col-12 md:col-3 flex align-items-center gap-2">
-                  <input
-                    pInputText
-                    formControlName="unit"
-                    placeholder="Unité *"
-                    class="w-full"
-                    [disabled]="isReadOnly"
-                  />
-                  <p-button
-                    *ngIf="!isReadOnly"
-                    type="button"
-                    icon="pi pi-trash"
-                    severity="danger"
-                    [text]="true"
-                    (click)="removeIngredient(i)"
-                  ></p-button>
-                </div>
+      <!-- Ingrédients -->
+      <div class="col-12">
+        <p-fieldset legend="Ingrédients">
+          <div formArrayName="ingredients">
+            <div
+              *ngFor="let ingredient of ingredients.controls; let i = index"
+              [formGroupName]="i"
+              class="grid align-items-center"
+              style="gap: 0; margin-bottom: 0rem"
+            >
+              <div class="col-12 md:col-4">
+                <input
+                  pInputText
+                  formControlName="name"
+                  placeholder="Nom de l'ingrédient *"
+                  class="w-full"
+                  [disabled]="isReadOnly"
+                />
+              </div>
+              <div class="col-12 md:col-2">
+                <p-inputnumber
+                  formControlName="quantity"
+                  [min]="0"
+                  placeholder="Quantité *"
+                  class="w-full"
+                  [disabled]="isReadOnly"
+                ></p-inputnumber>
+              </div>
+              <div class="col-12 md:col-3 flex align-items-center gap-2">
+                <input
+                  pInputText
+                  formControlName="unit"
+                  placeholder="Unité *"
+                  class="w-full"
+                  [disabled]="isReadOnly"
+                />
+                <p-button
+                  *ngIf="!isReadOnly"
+                  type="button"
+                  icon="pi pi-trash"
+                  severity="danger"
+                  [text]="true"
+                  (click)="removeIngredient(i)"
+                ></p-button>
               </div>
             </div>
+          </div>
 
-            <p-button
-              *ngIf="!isReadOnly"
-              type="button"
-              label="Ajouter un ingrédient"
-              icon="pi pi-plus"
-              [outlined]="true"
-              styleClass="mt-2"
-              (click)="addIngredient()"
-            ></p-button>
-          </p-fieldset>
-        </div>
-
-        <!-- Description -->
-        <div class="col-12">
-          <label for="description">Description *</label>
-          <textarea
-            pTextarea
-            id="description"
-            formControlName="description"
-            rows="4"
-            class="w-full"
-            [disabled]="isReadOnly"
-          ></textarea>
-        </div>
-
-        <!-- Saison -->
-        <div class="col-12 md:col-4">
-          <label for="season">Saison *</label>
-          <p-multiSelect
-            id="season"
-            formControlName="season"
-            [options]="seasons"
-            optionLabel="label"
-            optionValue="value"
-            placeholder="Choisir les saisons"
-            class="w-full"
-            [disabled]="isReadOnly"
-          ></p-multiSelect>
-        </div>
-
-        <!-- Temps de préparation -->
-        <div class="col-12 md:col-4">
-          <label for="prepTime">Temps (min)</label>
-          <p-inputnumber
-            id="prepTime"
-            formControlName="prepTime"
-            [min]="0"
-            suffix=" min"
-            class="w-full"
-            [disabled]="isReadOnly"
-          ></p-inputnumber>
-        </div>
-
-        <!-- Coût -->
-        <div class="col-12 md:col-4">
-          <label for="cost">Coût (€)</label>
-          <p-inputnumber
-            id="cost"
-            formControlName="cost"
-            [min]="0"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
-            prefix="€"
-            class="w-full"
-            [disabled]="isReadOnly"
-          ></p-inputnumber>
-        </div>
-
-        <!-- Actions -->
-        <div class="col-12 flex gap-2 justify-content-end">
           <p-button
-            *ngIf="isReadOnly"
+            *ngIf="!isReadOnly"
             type="button"
-            label="Fermer"
-            [text]="true"
-            (click)="onCancel()"
+            label="Ajouter un ingrédient"
+            icon="pi pi-plus"
+            [outlined]="true"
+            styleClass="mt-2"
+            (click)="addIngredient()"
           ></p-button>
-          <ng-container *ngIf="!isReadOnly">
-            <p-button type="button" label="Annuler" [text]="true" (click)="onCancel()"></p-button>
-            <p-button
-              type="submit"
-              [label]="isEditMode ? 'Enregistrer' : 'Créer'"
-              [disabled]="!recipeForm.valid"
-            ></p-button>
-          </ng-container>
-        </div>
+        </p-fieldset>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <label for="description">Description *</label>
+        <textarea
+          pTextarea
+          id="description"
+          formControlName="description"
+          rows="4"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></textarea>
+      </div>
+
+      <!-- Saison -->
+      <div class="col-12 md:col-4">
+        <label for="season">Saison *</label>
+        <p-multiSelect
+          id="season"
+          formControlName="season"
+          [options]="seasons"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Choisir les saisons"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></p-multiSelect>
+      </div>
+
+      <!-- Temps de préparation -->
+      <div class="col-12 md:col-4">
+        <label for="prepTime">Temps (min)</label>
+        <p-inputnumber
+          id="prepTime"
+          formControlName="prepTime"
+          [min]="0"
+          suffix=" min"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></p-inputnumber>
+      </div>
+
+      <!-- Coût -->
+      <div class="col-12 md:col-4">
+        <label for="cost">Coût (€)</label>
+        <p-inputnumber
+          id="cost"
+          formControlName="cost"
+          [min]="0"
+          [minFractionDigits]="2"
+          [maxFractionDigits]="2"
+          prefix="€"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></p-inputnumber>
+      </div>
+
+      <!-- Actions -->
+      <div class="col-12 flex gap-2 justify-content-end">
+        <p-button
+          *ngIf="isReadOnly"
+          type="button"
+          label="Fermer"
+          [text]="true"
+          (click)="onCancel()"
+        ></p-button>
+        <ng-container *ngIf="!isReadOnly">
+          <p-button type="button" label="Annuler" [text]="true" (click)="onCancel()"></p-button>
+          <p-button
+            type="submit"
+            [label]="isEditMode ? 'Enregistrer' : 'Créer'"
+            [disabled]="!recipeForm.valid"
+          ></p-button>
+        </ng-container>
+      </div>
     </div>
   </form>
 </p-dialog>
