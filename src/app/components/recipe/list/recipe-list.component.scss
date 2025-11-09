@@ -1,2 +1,7 @@
 // Styles pour recipe-list component
 // Le layout est géré par PrimeFlex (grid)
+
+::ng-deep .p-card {
+  border: 1px solid #ddd;
+  box-shadow: none;
+}

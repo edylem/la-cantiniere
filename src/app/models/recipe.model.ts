@@ -14,17 +14,17 @@ export interface RecipeModel {
   // Identifiants et métadonnées (obligatoires)
   id: string;
   title: string;
-  /** URL de l'image (optionnelle) */
+  /** Image en base64 ou URL (optionnelle) */
   image?: string;
 
   // Contenu de la recette
   ingredients: IngredientModel[];
   description: string;
-  season: Season;
-  /** Temps de préparation en minutes */
+  season: Season[]; // Peut être plusieurs saisons
+  /** Temps de préparation en minutes (optionnel) */
   prepTime?: number;
-  /** Coût estimé en euros (nombre) */
-  cost: number;
+  /** Coût estimé en euros (optionnel) */
+  cost?: number;
 }
 
 export default RecipeModel;

@@ -1,6 +1,13 @@
 <p-toast></p-toast>
 
 <div class="flex align-items-center gap-2 mb-3">
+  <button
+    pButton
+    type="button"
+    label="Nouvelle recette"
+    icon="pi pi-plus"
+    (click)="onNewRecipe()"
+  ></button>
   <button pButton type="button" label="Charger (fichier)" (click)="onLoadFromFile()"></button>
   <button
     pButton
@@ -20,6 +27,19 @@
 
 <div class="grid gap-3">
   <div *ngFor="let recipe of recipesSignal()" class="col-12 md:col-6 lg:col-4">
-    <app-recipe-card [recipe]="recipe"></app-recipe-card>
+    <app-recipe-card
+      [recipe]="recipe"
+      (edit)="onEditRecipe($event)"
+      (view)="onViewRecipe($event)"
+    ></app-recipe-card>
   </div>
 </div>
+
+<app-recipe-form
+  [recipe]="selectedRecipe"
+  [isReadOnly]="isReadOnly"
+  [visible]="showFormDialog"
+  (visibleChange)="showFormDialog = $event"
+  (save)="onSaveRecipe($event)"
+  (cancel)="onCancelForm()"
+></app-recipe-form>

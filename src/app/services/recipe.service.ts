@@ -33,13 +33,18 @@ export class RecipeService {
         throw new Error('Le fichier JSON doit contenir un tableau de recettes');
       }
 
-      const validRecipes = data.filter(
-        (item: any) =>
-          item &&
-          typeof item.id === 'string' &&
-          typeof item.title === 'string' &&
-          Array.isArray(item.ingredients)
-      );
+      const validRecipes = data
+        .filter(
+          (item: any) =>
+            item &&
+            typeof item.id === 'string' &&
+            typeof item.title === 'string' &&
+            Array.isArray(item.ingredients)
+        )
+        .map((item: any) => ({
+          ...item,
+          season: Array.isArray(item.season) ? item.season : [item.season], // Normalize season to array
+        }));
 
       this.recipes = validRecipes as RecipeModel[];
       this.recipesSignal.set(this.recipes);
@@ -87,13 +92,18 @@ export class RecipeService {
           }
 
           // Valider basiquement la structure (optionnel mais recommandé)
-          const validRecipes = data.filter(
-            (item: any) =>
-              item &&
-              typeof item.id === 'string' &&
-              typeof item.title === 'string' &&
-              Array.isArray(item.ingredients)
-          );
+          const validRecipes = data
+            .filter(
+              (item: any) =>
+                item &&
+                typeof item.id === 'string' &&
+                typeof item.title === 'string' &&
+                Array.isArray(item.ingredients)
+            )
+            .map((item: any) => ({
+              ...item,
+              season: Array.isArray(item.season) ? item.season : [item.season], // Normalize season to array
+            }));
 
           this.recipes = validRecipes as RecipeModel[];
           this.recipesSignal.set(this.recipes);
@@ -171,6 +181,37 @@ export class RecipeService {
       return true;
     }
     return false;
+  }
+
+  /**
+   * Sauvegarder une recette (création ou mise à jour)
+   * Si l'ID existe déjà, met à jour la recette, sinon l'ajoute avec un ID généré
+   * @param recipe La recette à sauvegarder
+   * @returns true si mise à jour, false si création
+   */
+  saveRecipe(recipe: RecipeModel): boolean {
+    let recipeToSave = recipe;
+
+    if (!recipe.id) {
+      // Générer un ID basé sur la date et l'heure
+      const now = new Date();
+      const id = now.toISOString().replace(/[:.]/g, '-');
+      recipeToSave = { ...recipe, id };
+    }
+
+    const existingIndex = this.recipes.findIndex((r) => r.id === recipeToSave.id);
+
+    if (existingIndex !== -1) {
+      // Mise à jour
+      this.recipes[existingIndex] = recipeToSave;
+      this.recipesSignal.set([...this.recipes]);
+      return true;
+    } else {
+      // Création
+      this.recipes.push(recipeToSave);
+      this.recipesSignal.set([...this.recipes]);
+      return false;
+    }
   }
 
   /**

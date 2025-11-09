@@ -1,18 +1,17 @@
-<p-card [header]="recipe.title" [subheader]="recipe.season">
+<p-card [header]="recipe.title" [subheader]="recipe.season.join(', ')">
   <ng-container *ngIf="recipe.image">
     <img class="recipe-image" [src]="recipe.image" [alt]="recipe.title" />
   </ng-container>
 
   <div class="recipe-meta flex justify-content-between align-items-center">
-    <div class="prep">⏱ {{ recipe.prepTime }} min</div>
-    <div class="cost">€{{ recipe.cost }}</div>
+    <div class="prep" *ngIf="recipe.prepTime">⏱ {{ recipe.prepTime }} min</div>
+    <div class="cost" *ngIf="recipe.cost">€{{ recipe.cost }}</div>
   </div>
-
-  <p class="description">{{ recipe.description }}</p>
 
   <div class="ingredients-count">Ingrédients: {{ recipe.ingredients.length }}</div>
 
-  <div class="actions">
-    <button pButton type="button" label="Voir" class="p-button-text"></button>
+    <div class="actions flex gap-2">
+    <button pButton type="button" icon="pi pi-eye" class="p-button-outlined" (click)="onView()"></button>
+    <button pButton type="button" icon="pi pi-pencil" class="p-button-outlined" (click)="onEdit()"></button>
   </div>
 </p-card>

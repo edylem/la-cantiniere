@@ -10,7 +10,7 @@
       { "name": "Huile d'olive", "quantity": 30, "unit": "ml" }
     ],
     "description": "Salade fraîche et rapide, parfaite pour l'été.",
-    "season": "Été",
+    "season": ["Été", "Printemps"],
     "prepTime": 10,
     "cost": 4.5
   },
@@ -25,7 +25,7 @@
       { "name": "Parmesan", "quantity": 50, "unit": "g" }
     ],
     "description": "Classique italien crémeux sans crème.",
-    "season": "Automne",
+    "season": ["Automne", "Hiver"],
     "prepTime": 25,
     "cost": 6.0
   },
@@ -40,8 +40,7 @@
       { "name": "Eau", "quantity": 1.5, "unit": "l" }
     ],
     "description": "Soupe réconfortante, simple et familiale.",
-    "season": "Hiver",
-    "prepTime": 45,
-    "cost": 3.2
+    "season": ["Hiver", "Automne"],
+    "prepTime": 45
   }
 ]

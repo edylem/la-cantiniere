@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RecipeModel } from '../../../models/recipe.model';
 import { RecipeCardComponent } from '../card/recipe-card.component';
+import { RecipeFormComponent } from '../form/recipe-form.component';
 import { RecipeService } from '../../../services/recipe.service';
 import { ButtonModule } from 'primeng/button';
 import { ToastModule } from 'primeng/toast';
@@ -11,11 +12,14 @@ import { MessageService } from 'primeng/api';
   selector: 'app-recipe-list',
   standalone: true,
   providers: [MessageService],
-  imports: [CommonModule, RecipeCardComponent, ButtonModule, ToastModule],
+  imports: [CommonModule, RecipeCardComponent, RecipeFormComponent, ButtonModule, ToastModule],
   templateUrl: './recipe-list.component.html',
   styleUrls: ['./recipe-list.component.scss'],
 })
 export class RecipeListComponent {
+  showFormDialog = false;
+  selectedRecipe?: RecipeModel;
+  isReadOnly = false;
   // Le composant lit les recettes depuis le service. Si le service ne contient
   // aucune recette au démarrage, on déclenche `loadData()` pour inviter
   // l'utilisateur à sélectionner un fichier JSON.
@@ -99,5 +103,41 @@ export class RecipeListComponent {
         life: 4000,
       });
     }
+  }
+
+  onNewRecipe(): void {
+    this.selectedRecipe = undefined;
+    this.isReadOnly = false;
+    this.showFormDialog = true;
+  }
+
+  onViewRecipe(recipe: RecipeModel): void {
+    this.selectedRecipe = recipe;
+    this.isReadOnly = true;
+    this.showFormDialog = true;
+  }
+
+  onEditRecipe(recipe: RecipeModel): void {
+    this.selectedRecipe = recipe;
+    this.isReadOnly = false;
+    this.showFormDialog = true;
+  }
+
+  onSaveRecipe(recipe: RecipeModel): void {
+    const isUpdate = this.recipeService.saveRecipe(recipe);
+    this.messageService.add({
+      severity: 'success',
+      summary: isUpdate ? 'Mise à jour' : 'Création',
+      detail: `Recette "${recipe.title}" ${isUpdate ? 'mise à jour' : 'créée'} avec succès`,
+      life: 3000,
+    });
+    this.showFormDialog = false;
+    this.selectedRecipe = undefined;
+  }
+
+  onCancelForm(): void {
+    this.showFormDialog = false;
+    this.selectedRecipe = undefined;
+    this.isReadOnly = false;
   }
 }
