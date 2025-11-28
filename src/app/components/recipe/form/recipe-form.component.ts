@@ -9,7 +9,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RecipeModel, ALL_SEASONS } from '../../../models/recipe.model';
+import { ImageService } from '../../../services/image.service';
+import { RecipeModel, ALL_SEASONS, ALL_CATEGORIES } from '../../../models/recipe.model';
 import { IngredientModel } from '../../../models/ingredient.model';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
@@ -48,8 +49,9 @@ export class RecipeFormComponent implements OnInit, OnChanges {
 
   recipeForm!: FormGroup;
   seasons = ALL_SEASONS.map((s) => ({ label: s, value: s }));
+  categories = ALL_CATEGORIES.map((c) => ({ label: c, value: c }));
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private imageService: ImageService) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -72,7 +74,9 @@ export class RecipeFormComponent implements OnInit, OnChanges {
       title: ['', Validators.required],
       image: [''],
       description: ['', Validators.required],
-      season: [[], Validators.required],
+      season: [[]],
+      category: [[]],
+      personnes: [null, Validators.min(1)],
       prepTime: [null, Validators.min(1)],
       cost: [null, Validators.min(0)],
       ingredients: this.fb.array([]),
@@ -86,8 +90,8 @@ export class RecipeFormComponent implements OnInit, OnChanges {
   private createIngredientFormGroup(ingredient?: IngredientModel): FormGroup {
     return this.fb.group({
       name: [ingredient?.name || '', Validators.required],
-      quantity: [ingredient?.quantity || null, [Validators.required, Validators.min(0)]],
-      unit: [ingredient?.unit || '', Validators.required],
+      quantity: [ingredient?.quantity || null, Validators.min(0)],
+      unit: [ingredient?.unit || ''],
     });
   }
 
@@ -104,7 +108,9 @@ export class RecipeFormComponent implements OnInit, OnChanges {
       title: recipe.title,
       image: recipe.image || '',
       description: recipe.description,
-      season: recipe.season,
+      season: recipe.season || [],
+      category: recipe.category || [],
+      personnes: recipe.personnes,
       prepTime: recipe.prepTime,
       cost: recipe.cost,
     });
@@ -123,7 +129,9 @@ export class RecipeFormComponent implements OnInit, OnChanges {
         title: formValue.title,
         image: formValue.image || undefined,
         description: formValue.description,
-        season: formValue.season,
+        season: formValue.season?.length ? formValue.season : undefined,
+        category: formValue.category?.length ? formValue.category : undefined,
+        personnes: formValue.personnes,
         prepTime: formValue.prepTime,
         cost: formValue.cost,
         ingredients: formValue.ingredients,
@@ -140,12 +148,9 @@ export class RecipeFormComponent implements OnInit, OnChanges {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64 = reader.result as string;
+      this.imageService.compressImage(file, 200, 150, 0.8).then((base64) => {
         this.recipeForm.patchValue({ image: base64 });
-      };
-      reader.readAsDataURL(file);
+      });
     }
   }
 

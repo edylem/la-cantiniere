@@ -1,4 +1,6 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { RecipeModel } from '../models/recipe.model';
 import { FirestoreService } from './firestore.service';
 
@@ -15,22 +17,24 @@ export class RecipeService {
   // Configuration Firestore
   private static readonly COLLECTION_NAME = 'recipes';
 
-  private recipes: RecipeModel[] = [];
-  private initialized = false;
+  // Cache des recettes (pas de signal, pas d'observable)
+  private cache: RecipeModel[] = [];
+  private isLoaded = false;
 
-  // Signal pour notifier les changements (Angular zoneless friendly)
-  private recipesSignal = signal<RecipeModel[]>([]);
+  constructor(private firestoreService: FirestoreService) {}
 
-  constructor(private firestoreService: FirestoreService) {
-    // Chargement automatique au démarrage
-    this.loadFromFirestore();
+  /**
+   * Indique si les données sont chargées
+   */
+  get loaded(): boolean {
+    return this.isLoaded;
   }
 
   /**
-   * Récupère les recettes actuelles
+   * Récupère les recettes depuis le cache
    */
   getRecipes(): RecipeModel[] {
-    return this.recipes;
+    return this.cache;
   }
 
   /**
@@ -42,54 +46,40 @@ export class RecipeService {
   }
 
   /**
-   * Charge les recettes depuis Firestore
-   * @returns Promise avec le nombre de recettes chargées
+   * Charge les recettes depuis Firestore dans le cache
+   * @returns Observable avec le nombre de recettes chargées
    */
-  async loadFromFirestore(): Promise<number> {
-    try {
-      const docs = await this.firestoreService.getAllDocuments<RecipeDocument>(
-        RecipeService.COLLECTION_NAME
+  load(): Observable<number> {
+    return this.firestoreService
+      .getAllDocuments<RecipeDocument>(RecipeService.COLLECTION_NAME)
+      .pipe(
+        map((docs) =>
+          docs.map((doc) => {
+            const recipe = doc.data.data;
+            return {
+              ...recipe,
+              id: doc.id,
+              season: Array.isArray(recipe.season)
+                ? recipe.season
+                : recipe.season
+                ? [recipe.season]
+                : undefined,
+            };
+          })
+        ),
+        tap((recipes) => {
+          this.cache = recipes;
+          this.isLoaded = true;
+        }),
+        map((recipes) => recipes.length)
       );
-
-      this.recipes = docs.map((doc) => {
-        const recipe = doc.data.data;
-        return {
-          ...recipe,
-          id: doc.id, // Utiliser l'ID du document Firestore
-          season: Array.isArray(recipe.season) ? recipe.season : [recipe.season],
-        };
-      });
-
-      this.recipesSignal.set(this.recipes);
-      return this.recipes.length;
-    } catch (error) {
-      console.error('Erreur lors du chargement depuis Firestore:', error);
-      throw error;
-    }
-  }
-
-  /**
-   * Sauvegarde toutes les recettes dans Firestore (crée/met à jour chaque document)
-   */
-  async saveToFirestore(): Promise<void> {
-    try {
-      for (const recipe of this.recipes) {
-        await this.firestoreService.setDocument(RecipeService.COLLECTION_NAME, recipe.id, {
-          id: recipe.id,
-          data: recipe,
-        });
-      }
-    } catch (error) {
-      console.error('Erreur lors de la sauvegarde vers Firestore:', error);
-      throw error;
-    }
   }
 
   /**
    * Sauvegarde une recette individuelle dans Firestore
    */
-  private async saveRecipeToFirestore(recipe: RecipeModel): Promise<void> {
-    await this.firestoreService.setDocument(RecipeService.COLLECTION_NAME, recipe.id, {
+  private saveRecipeToFirestore(recipe: RecipeModel): Observable<void> {
+    return this.firestoreService.setDocument(RecipeService.COLLECTION_NAME, recipe.id, {
       id: recipe.id,
       data: recipe,
     });
@@ -98,8 +88,8 @@ export class RecipeService {
   /**
    * Supprime une recette de Firestore
    */
-  private async deleteRecipeFromFirestore(id: string): Promise<void> {
-    await this.firestoreService.deleteDocument(RecipeService.COLLECTION_NAME, id);
+  private deleteRecipeFromFirestore(id: string): Observable<void> {
+    return this.firestoreService.deleteDocument(RecipeService.COLLECTION_NAME, id);
   }
 
   /**
@@ -129,19 +119,11 @@ export class RecipeService {
           season: Array.isArray(item.season) ? item.season : [item.season], // Normalize season to array
         }));
 
-      this.recipes = validRecipes as RecipeModel[];
-      this.recipesSignal.set(this.recipes);
+      this.cache = validRecipes as RecipeModel[];
       return validRecipes.length;
     } catch (err) {
       throw err;
     }
-  }
-
-  /**
-   * Signal readonly pour les composants
-   */
-  get recipes$() {
-    return this.recipesSignal.asReadonly();
   }
 
   /**
@@ -188,8 +170,7 @@ export class RecipeService {
               season: Array.isArray(item.season) ? item.season : [item.season], // Normalize season to array
             }));
 
-          this.recipes = validRecipes as RecipeModel[];
-          this.recipesSignal.set(this.recipes);
+          this.cache = validRecipes as RecipeModel[];
 
           resolve(validRecipes.length);
         } catch (error) {
@@ -212,7 +193,7 @@ export class RecipeService {
    */
   downloadData(filename: string = 'recipes.json'): void {
     // Convertir les recettes en JSON formaté
-    const jsonString = JSON.stringify(this.recipes, null, 2);
+    const jsonString = JSON.stringify(this.cache, null, 2);
 
     // Créer un Blob
     const blob = new Blob([jsonString], { type: 'application/json' });
@@ -233,36 +214,36 @@ export class RecipeService {
   }
 
   /**
-   * Ajouter une recette
+   * Ajouter une recette au cache
    */
   addRecipe(recipe: RecipeModel): void {
-    this.recipes.push(recipe);
-    this.recipesSignal.set([...this.recipes]);
+    this.cache.push(recipe);
   }
 
   /**
    * Supprimer une recette par ID
-   * Sauvegarde automatiquement vers Firestore
+   * Met à jour le cache et Firestore
+   * @returns Observable<boolean>
    */
-  async deleteRecipe(id: string): Promise<boolean> {
-    const index = this.recipes.findIndex((r) => r.id === id);
+  deleteRecipe(id: string): Observable<boolean> {
+    const index = this.cache.findIndex((r) => r.id === id);
     if (index !== -1) {
-      this.recipes.splice(index, 1);
-      this.recipesSignal.set([...this.recipes]);
-      await this.deleteRecipeFromFirestore(id);
-      return true;
+      this.cache.splice(index, 1);
+      return this.deleteRecipeFromFirestore(id).pipe(map(() => true));
     }
-    return false;
+    return new Observable((subscriber) => {
+      subscriber.next(false);
+      subscriber.complete();
+    });
   }
 
   /**
-   * Mettre à jour une recette
+   * Mettre à jour une recette dans le cache
    */
   updateRecipe(id: string, updatedRecipe: RecipeModel): boolean {
-    const index = this.recipes.findIndex((r) => r.id === id);
+    const index = this.cache.findIndex((r) => r.id === id);
     if (index !== -1) {
-      this.recipes[index] = updatedRecipe;
-      this.recipesSignal.set([...this.recipes]);
+      this.cache[index] = updatedRecipe;
       return true;
     }
     return false;
@@ -270,12 +251,11 @@ export class RecipeService {
 
   /**
    * Sauvegarder une recette (création ou mise à jour)
-   * Si l'ID existe déjà, met à jour la recette, sinon l'ajoute avec un ID généré
-   * Sauvegarde automatiquement vers Firestore
+   * Met à jour le cache et Firestore
    * @param recipe La recette à sauvegarder
-   * @returns true si mise à jour, false si création
+   * @returns Observable<boolean> true si mise à jour, false si création
    */
-  async saveRecipe(recipe: RecipeModel): Promise<boolean> {
+  saveRecipe(recipe: RecipeModel): Observable<boolean> {
     let recipeToSave = recipe;
 
     if (!recipe.id) {
@@ -284,32 +264,27 @@ export class RecipeService {
       recipeToSave = { ...recipe, id };
     }
 
-    const existingIndex = this.recipes.findIndex((r) => r.id === recipeToSave.id);
+    const existingIndex = this.cache.findIndex((r) => r.id === recipeToSave.id);
     let isUpdate: boolean;
 
     if (existingIndex !== -1) {
-      // Mise à jour
-      this.recipes[existingIndex] = recipeToSave;
+      // Mise à jour dans le cache
+      this.cache[existingIndex] = recipeToSave;
       isUpdate = true;
     } else {
-      // Création
-      this.recipes.push(recipeToSave);
+      // Création dans le cache
+      this.cache.push(recipeToSave);
       isUpdate = false;
     }
 
-    this.recipesSignal.set([...this.recipes]);
-
-    // Sauvegarder vers Firestore (uniquement cette recette)
-    await this.saveRecipeToFirestore(recipeToSave);
-
-    return isUpdate;
+    // Sauvegarder vers Firestore
+    return this.saveRecipeToFirestore(recipeToSave).pipe(map(() => isUpdate));
   }
 
   /**
-   * Réinitialiser toutes les recettes
+   * Réinitialiser le cache
    */
   clearRecipes(): void {
-    this.recipes = [];
-    this.recipesSignal.set([]);
+    this.cache = [];
   }
 }

@@ -35,3 +35,52 @@ p-floatlabel {
   margin-top: 0.5rem;
   border: 1px solid #ddd;
 }
+
+// Ingrédients compacts
+.ingredients-section {
+  padding: 0 !important;
+}
+
+.ingredient-row {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  margin-bottom: 0.2rem;
+}
+
+.ingredient-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.5rem !important;
+}
+
+.ingredient-qty {
+  width: 3rem !important;
+  flex-shrink: 0;
+}
+
+::ng-deep .ingredient-qty {
+  .p-inputnumber,
+  .p-inputnumber-input {
+    width: 3rem !important;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.25rem !important;
+    text-align: center;
+  }
+}
+
+.ingredient-unit {
+  width: 3.5rem !important;
+  flex-shrink: 0;
+  font-size: 0.85rem;
+  padding: 0.35rem 0.25rem !important;
+}
+
+::ng-deep .ingredient-row {
+  .p-button {
+    padding: 0.25rem !important;
+    width: 1.75rem !important;
+    height: 1.75rem !important;
+  }
+}

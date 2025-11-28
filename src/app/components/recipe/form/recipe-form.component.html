@@ -43,7 +43,6 @@
             (change)="onImageSelect($event)"
             style="display: none"
           />
-          <small *ngIf="recipeForm.get('image')?.value">Image sélectionnée</small>
         </div>
         <img
           *ngIf="recipeForm.get('image')?.value"
@@ -54,60 +53,53 @@
       </div>
 
       <!-- Ingrédients -->
-      <div class="col-12">
+      <div class="col-12 ingredients-section">
         <p-fieldset legend="Ingrédients">
           <div formArrayName="ingredients">
             <div
               *ngFor="let ingredient of ingredients.controls; let i = index"
               [formGroupName]="i"
-              class="grid align-items-center"
-              style="gap: 0; margin-bottom: 0rem"
+              class="ingredient-row"
             >
-              <div class="col-12 md:col-4">
-                <input
-                  pInputText
-                  formControlName="name"
-                  placeholder="Nom de l'ingrédient *"
-                  class="w-full"
-                  [disabled]="isReadOnly"
-                />
-              </div>
-              <div class="col-12 md:col-2">
-                <p-inputnumber
-                  formControlName="quantity"
-                  [min]="0"
-                  placeholder="Quantité *"
-                  class="w-full"
-                  [disabled]="isReadOnly"
-                ></p-inputnumber>
-              </div>
-              <div class="col-12 md:col-3 flex align-items-center gap-2">
-                <input
-                  pInputText
-                  formControlName="unit"
-                  placeholder="Unité *"
-                  class="w-full"
-                  [disabled]="isReadOnly"
-                />
-                <p-button
-                  *ngIf="!isReadOnly"
-                  type="button"
-                  icon="pi pi-trash"
-                  severity="danger"
-                  [text]="true"
-                  (click)="removeIngredient(i)"
-                ></p-button>
-              </div>
+              <input
+                pInputText
+                formControlName="name"
+                placeholder="Nom *"
+                class="ingredient-name"
+                [disabled]="isReadOnly"
+              />
+              <p-inputnumber
+                formControlName="quantity"
+                [min]="0"
+                placeholder="Qté"
+                class="ingredient-qty"
+                [disabled]="isReadOnly"
+              ></p-inputnumber>
+              <input
+                pInputText
+                formControlName="unit"
+                placeholder="Unité"
+                class="ingredient-unit"
+                [disabled]="isReadOnly"
+              />
+              <p-button
+                *ngIf="!isReadOnly"
+                type="button"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                (click)="removeIngredient(i)"
+              ></p-button>
             </div>
           </div>
 
           <p-button
             *ngIf="!isReadOnly"
             type="button"
-            label="Ajouter un ingrédient"
+            label="Ajouter"
             icon="pi pi-plus"
             [outlined]="true"
-            styleClass="mt-2"
+            size="small"
             (click)="addIngredient()"
           ></p-button>
         </p-fieldset>
@@ -126,9 +118,21 @@
         ></textarea>
       </div>
 
+      <!-- Nombre de personnes -->
+      <div class="col-12 md:col-3">
+        <label for="personnes">Nombre de personnes</label>
+        <p-inputnumber
+          id="personnes"
+          formControlName="personnes"
+          [min]="1"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></p-inputnumber>
+      </div>
+
       <!-- Saison -->
-      <div class="col-12 md:col-4">
-        <label for="season">Saison *</label>
+      <div class="col-12 md:col-3">
+        <label for="season">Saison</label>
         <p-multiSelect
           id="season"
           formControlName="season"
@@ -141,8 +145,23 @@
         ></p-multiSelect>
       </div>
 
+      <!-- Catégorie -->
+      <div class="col-12 md:col-6">
+        <label for="category">Catégorie</label>
+        <p-multiSelect
+          id="category"
+          formControlName="category"
+          [options]="categories"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Choisir les catégories"
+          class="w-full"
+          [disabled]="isReadOnly"
+        ></p-multiSelect>
+      </div>
+
       <!-- Temps de préparation -->
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-3">
         <label for="prepTime">Temps (min)</label>
         <p-inputnumber
           id="prepTime"
@@ -155,7 +174,7 @@
       </div>
 
       <!-- Coût -->
-      <div class="col-12 md:col-4">
+      <div class="col-12 md:col-3">
         <label for="cost">Coût (€)</label>
         <p-inputnumber
           id="cost"

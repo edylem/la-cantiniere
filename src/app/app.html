@@ -6,6 +6,8 @@
 <!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
+<app-splash-screen *ngIf="showSplash" (complete)="onSplashComplete()"></app-splash-screen>
+
 <p-toast></p-toast>
 <app-title-bar></app-title-bar>
 <router-outlet />

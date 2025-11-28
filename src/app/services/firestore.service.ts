@@ -12,6 +12,8 @@ import {
   deleteDoc,
   DocumentData,
 } from 'firebase/firestore';
+import { Observable, from } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 /**
  * Service générique pour les opérations Firestore
@@ -42,45 +44,38 @@ export class FirestoreService {
    * Récupère un document par son ID
    * @param collectionName Nom de la collection
    * @param docId ID du document
-   * @returns Les données du document ou null
+   * @returns Observable avec les données du document ou null
    */
-  async getDocument<T>(collectionName: string, docId: string): Promise<T | null> {
-    try {
-      const docRef = doc(this.db, collectionName, docId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        return docSnap.data() as T;
-      }
-      return null;
-    } catch (error) {
-      console.error(`Erreur lors de la récupération du document ${docId}:`, error);
-      throw error;
-    }
+  getDocument<T>(collectionName: string, docId: string): Observable<T | null> {
+    const docRef = doc(this.db, collectionName, docId);
+    return from(getDoc(docRef)).pipe(
+      map((docSnap) => {
+        if (docSnap.exists()) {
+          return docSnap.data() as T;
+        }
+        return null;
+      })
+    );
   }
 
   /**
    * Récupère tous les documents d'une collection
    * @param collectionName Nom de la collection
-   * @returns Tableau des documents avec leurs IDs
+   * @returns Observable avec tableau des documents avec leurs IDs
    */
-  async getAllDocuments<T>(collectionName: string): Promise<{ id: string; data: T }[]> {
-    try {
-      const querySnapshot = await getDocs(collection(this.db, collectionName));
-      const documents: { id: string; data: T }[] = [];
-
-      querySnapshot.forEach((doc) => {
-        documents.push({
-          id: doc.id,
-          data: doc.data() as T,
+  getAllDocuments<T>(collectionName: string): Observable<{ id: string; data: T }[]> {
+    return from(getDocs(collection(this.db, collectionName))).pipe(
+      map((querySnapshot) => {
+        const documents: { id: string; data: T }[] = [];
+        querySnapshot.forEach((doc) => {
+          documents.push({
+            id: doc.id,
+            data: doc.data() as T,
+          });
         });
-      });
-
-      return documents;
-    } catch (error) {
-      console.error(`Erreur lors de la récupération de la collection ${collectionName}:`, error);
-      throw error;
-    }
+        return documents;
+      })
+    );
   }
 
   /**
@@ -95,19 +90,15 @@ export class FirestoreService {
    * @param collectionName Nom de la collection
    * @param docId ID du document
    * @param data Données à sauvegarder
+   * @returns Observable<void>
    */
-  async setDocument<T extends DocumentData>(
+  setDocument<T extends DocumentData>(
     collectionName: string,
     docId: string,
     data: T
-  ): Promise<void> {
-    try {
-      const docRef = doc(this.db, collectionName, docId);
-      await setDoc(docRef, this.cleanData(data));
-    } catch (error) {
-      console.error(`Erreur lors de la sauvegarde du document ${docId}:`, error);
-      throw error;
-    }
+  ): Observable<void> {
+    const docRef = doc(this.db, collectionName, docId);
+    return from(setDoc(docRef, this.cleanData(data)));
   }
 
   /**
@@ -115,33 +106,25 @@ export class FirestoreService {
    * @param collectionName Nom de la collection
    * @param docId ID du document
    * @param data Données partielles à mettre à jour
+   * @returns Observable<void>
    */
-  async updateDocument(
+  updateDocument(
     collectionName: string,
     docId: string,
     data: Partial<DocumentData>
-  ): Promise<void> {
-    try {
-      const docRef = doc(this.db, collectionName, docId);
-      await updateDoc(docRef, data);
-    } catch (error) {
-      console.error(`Erreur lors de la mise à jour du document ${docId}:`, error);
-      throw error;
-    }
+  ): Observable<void> {
+    const docRef = doc(this.db, collectionName, docId);
+    return from(updateDoc(docRef, data));
   }
 
   /**
    * Supprime un document
    * @param collectionName Nom de la collection
    * @param docId ID du document
+   * @returns Observable<void>
    */
-  async deleteDocument(collectionName: string, docId: string): Promise<void> {
-    try {
-      const docRef = doc(this.db, collectionName, docId);
-      await deleteDoc(docRef);
-    } catch (error) {
-      console.error(`Erreur lors de la suppression du document ${docId}:`, error);
-      throw error;
-    }
+  deleteDocument(collectionName: string, docId: string): Observable<void> {
+    const docRef = doc(this.db, collectionName, docId);
+    return from(deleteDoc(docRef));
   }
 }

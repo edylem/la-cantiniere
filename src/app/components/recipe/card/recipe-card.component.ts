@@ -23,6 +23,7 @@ export class RecipeCardComponent {
   @Input({ required: true }) recipe!: RecipeModel;
   @Output() edit = new EventEmitter<RecipeModel>();
   @Output() view = new EventEmitter<RecipeModel>();
+  @Output() delete = new EventEmitter<RecipeModel>();
 
   onEdit(): void {
     this.edit.emit(this.recipe);
@@ -60,5 +61,9 @@ export class RecipeCardComponent {
 
   onView(): void {
     this.view.emit(this.recipe);
+  }
+
+  onDelete(): void {
+    this.delete.emit(this.recipe);
   }
 }

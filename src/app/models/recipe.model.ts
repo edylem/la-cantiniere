@@ -4,6 +4,15 @@ import { IngredientModel } from './ingredient.model';
 export const ALL_SEASONS = ['Printemps', 'Été', 'Automne', 'Hiver'] as const;
 export type Season = (typeof ALL_SEASONS)[number];
 
+// Catégories de recettes
+export const ALL_CATEGORIES = [
+  'Que pour les parents',
+  'Repas Gourmand',
+  'Pour les grandes occasions',
+  'Recette rapide',
+] as const;
+export type Category = (typeof ALL_CATEGORIES)[number];
+
 /**
  * RecipeModel
  * - ingredients: liste d'IngredientModel
@@ -20,7 +29,12 @@ export interface RecipeModel {
   // Contenu de la recette
   ingredients: IngredientModel[];
   description: string;
-  season: Season[]; // Peut être plusieurs saisons
+  /** Saisons (optionnel) */
+  season?: Season[];
+  /** Catégories (optionnel) */
+  category?: Category[];
+  /** Nombre de personnes (optionnel) */
+  personnes?: number;
   /** Temps de préparation en minutes (optionnel) */
   prepTime?: number;
   /** Coût estimé en euros (optionnel) */

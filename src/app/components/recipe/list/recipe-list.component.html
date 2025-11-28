@@ -1,4 +1,7 @@
-<div class="flex align-items-center gap-2 mb-3">
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="flex justify-content-center gap-2 mt-3 mb-3">
   <button
     pButton
     type="button"
@@ -6,14 +9,24 @@
     icon="pi pi-plus"
     (click)="onNewRecipe()"
   ></button>
+  <button
+    pButton
+    type="button"
+    [label]="hasActiveFilters ? 'Filtres actifs' : 'Filtrer'"
+    icon="pi pi-filter"
+    [outlined]="!hasActiveFilters"
+    [severity]="hasActiveFilters ? 'info' : 'secondary'"
+    (click)="onOpenFilter()"
+  ></button>
 </div>
 
-<div class="grid gap-3">
-  <div *ngFor="let recipe of recipesSignal()" class="col-12 md:col-6 lg:col-4">
+<div class="grid">
+  <div *ngFor="let recipe of recipes" class="col-12 md:col-6 lg:col-4 xl:col-3">
     <app-recipe-card
       [recipe]="recipe"
       (edit)="onEditRecipe($event)"
       (view)="onViewRecipe($event)"
+      (delete)="onDeleteRecipe($event)"
     ></app-recipe-card>
   </div>
 </div>
@@ -26,3 +39,10 @@
   (save)="onSaveRecipe($event)"
   (cancel)="onCancelForm()"
 ></app-recipe-form>
+
+<app-recipe-filter
+  [visible]="showFilterDialog"
+  [initialFilters]="currentFilters"
+  (visibleChange)="showFilterDialog = $event"
+  (filtersChange)="onFiltersChange($event)"
+></app-recipe-filter>

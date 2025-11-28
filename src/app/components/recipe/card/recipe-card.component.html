@@ -4,7 +4,12 @@
   </ng-container>
 
   <div class="recipe-meta flex justify-content-between align-items-center">
-    <div class="prep" *ngIf="recipe.prepTime">⏱ {{ recipe.prepTime }} min</div>
+    <div class="meta-left flex align-items-center gap-3">
+      <div class="prep" *ngIf="recipe.prepTime">⏱ {{ recipe.prepTime }} min</div>
+      <div class="personnes" *ngIf="recipe.personnes">
+        <i class="pi pi-user"></i> {{ recipe.personnes }}
+      </div>
+    </div>
     <div class="season">
       <span
         *ngFor="let s of recipe.season"
@@ -30,6 +35,13 @@
       icon="pi pi-pencil"
       class="p-button-outlined"
       (click)="onEdit()"
+    ></button>
+    <button
+      pButton
+      type="button"
+      icon="pi pi-trash"
+      class="p-button-outlined p-button-danger"
+      (click)="onDelete()"
     ></button>
   </div>
 </p-card>

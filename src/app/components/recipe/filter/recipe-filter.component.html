@@ -1,0 +1,131 @@
+<p-dialog
+  [(visible)]="visible"
+  (visibleChange)="visibleChange.emit($event)"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  header="Filtrer les recettes"
+  [dismissableMask]="true"
+>
+  <div class="flex flex-column gap-3">
+    <!-- Saisons -->
+    <div>
+      <label for="seasons">Saisons</label>
+      <p-multiSelect
+        id="seasons"
+        [(ngModel)]="filters.seasons"
+        [options]="seasonOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Toutes les saisons"
+        class="w-full"
+      ></p-multiSelect>
+    </div>
+
+    <!-- Catégories -->
+    <div>
+      <label for="categories">Catégories</label>
+      <p-multiSelect
+        id="categories"
+        [(ngModel)]="filters.categories"
+        [options]="categoryOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Toutes les catégories"
+        class="w-full"
+      ></p-multiSelect>
+    </div>
+
+    <!-- Temps de préparation max -->
+    <div>
+      <label for="maxPrepTime">Temps max (min)</label>
+      <p-inputnumber
+        id="maxPrepTime"
+        [(ngModel)]="filters.maxPrepTime"
+        [min]="0"
+        placeholder="Pas de limite"
+        class="w-full"
+      ></p-inputnumber>
+    </div>
+
+    <!-- Coût max -->
+    <div>
+      <label for="maxCost">Coût max (€)</label>
+      <p-inputnumber
+        id="maxCost"
+        [(ngModel)]="filters.maxCost"
+        [min]="0"
+        [minFractionDigits]="2"
+        [maxFractionDigits]="2"
+        placeholder="Pas de limite"
+        class="w-full"
+      ></p-inputnumber>
+    </div>
+
+    <!-- Nombre de personnes -->
+    <div class="flex gap-2">
+      <div class="flex-1">
+        <label for="minPersonnes">Personnes min</label>
+        <p-inputnumber
+          id="minPersonnes"
+          [(ngModel)]="filters.minPersonnes"
+          [min]="1"
+          class="w-full"
+        ></p-inputnumber>
+      </div>
+      <div class="flex-1">
+        <label for="maxPersonnes">Personnes max</label>
+        <p-inputnumber
+          id="maxPersonnes"
+          [(ngModel)]="filters.maxPersonnes"
+          [min]="1"
+          class="w-full"
+        ></p-inputnumber>
+      </div>
+    </div>
+
+    <!-- Ingrédients -->
+    <div>
+      <label>Ingrédients (contient)</label>
+      <div class="flex flex-column gap-2 mt-1">
+        <input
+          pInputText
+          [(ngModel)]="filters.ingredients[0]"
+          placeholder="Ingrédient 1"
+          class="w-full"
+        />
+        <input
+          pInputText
+          [(ngModel)]="filters.ingredients[1]"
+          placeholder="Ingrédient 2"
+          class="w-full"
+        />
+        <input
+          pInputText
+          [(ngModel)]="filters.ingredients[2]"
+          placeholder="Ingrédient 3"
+          class="w-full"
+        />
+        <input
+          pInputText
+          [(ngModel)]="filters.ingredients[3]"
+          placeholder="Ingrédient 4"
+          class="w-full"
+        />
+      </div>
+    </div>
+
+    <!-- Boutons -->
+    <div class="flex gap-2 justify-content-between mt-3 pt-3 border-top-1 surface-border">
+      <button
+        pButton
+        label="Réinitialiser"
+        class="p-button-secondary p-button-outlined"
+        (click)="onReset()"
+      ></button>
+      <div class="flex gap-2">
+        <button pButton label="Annuler" class="p-button-text" (click)="onCancel()"></button>
+        <button pButton label="Appliquer" (click)="onApply()"></button>
+      </div>
+    </div>
+  </div>
+</p-dialog>
