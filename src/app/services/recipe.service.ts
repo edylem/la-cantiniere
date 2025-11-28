@@ -1,22 +1,105 @@
 import { Injectable, signal } from '@angular/core';
 import { RecipeModel } from '../models/recipe.model';
+import { FirestoreService } from './firestore.service';
+
+// Interface pour le document Firestore (un document par recette)
+interface RecipeDocument {
+  id: string;
+  data: RecipeModel;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class RecipeService {
+  // Configuration Firestore
+  private static readonly COLLECTION_NAME = 'recipes';
+
   private recipes: RecipeModel[] = [];
+  private initialized = false;
 
   // Signal pour notifier les changements (Angular zoneless friendly)
   private recipesSignal = signal<RecipeModel[]>([]);
 
-  constructor() {}
+  constructor(private firestoreService: FirestoreService) {
+    // Chargement automatique au démarrage
+    this.loadFromFirestore();
+  }
 
   /**
    * Récupère les recettes actuelles
    */
   getRecipes(): RecipeModel[] {
     return this.recipes;
+  }
+
+  /**
+   * Génère un ID unique
+   */
+  private generateId(): string {
+    const now = new Date();
+    return now.toISOString().replace(/[:.]/g, '-') + '-' + Math.random().toString(36).substr(2, 9);
+  }
+
+  /**
+   * Charge les recettes depuis Firestore
+   * @returns Promise avec le nombre de recettes chargées
+   */
+  async loadFromFirestore(): Promise<number> {
+    try {
+      const docs = await this.firestoreService.getAllDocuments<RecipeDocument>(
+        RecipeService.COLLECTION_NAME
+      );
+
+      this.recipes = docs.map((doc) => {
+        const recipe = doc.data.data;
+        return {
+          ...recipe,
+          id: doc.id, // Utiliser l'ID du document Firestore
+          season: Array.isArray(recipe.season) ? recipe.season : [recipe.season],
+        };
+      });
+
+      this.recipesSignal.set(this.recipes);
+      return this.recipes.length;
+    } catch (error) {
+      console.error('Erreur lors du chargement depuis Firestore:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Sauvegarde toutes les recettes dans Firestore (crée/met à jour chaque document)
+   */
+  async saveToFirestore(): Promise<void> {
+    try {
+      for (const recipe of this.recipes) {
+        await this.firestoreService.setDocument(RecipeService.COLLECTION_NAME, recipe.id, {
+          id: recipe.id,
+          data: recipe,
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde vers Firestore:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Sauvegarde une recette individuelle dans Firestore
+   */
+  private async saveRecipeToFirestore(recipe: RecipeModel): Promise<void> {
+    await this.firestoreService.setDocument(RecipeService.COLLECTION_NAME, recipe.id, {
+      id: recipe.id,
+      data: recipe,
+    });
+  }
+
+  /**
+   * Supprime une recette de Firestore
+   */
+  private async deleteRecipeFromFirestore(id: string): Promise<void> {
+    await this.firestoreService.deleteDocument(RecipeService.COLLECTION_NAME, id);
   }
 
   /**
@@ -159,12 +242,14 @@ export class RecipeService {
 
   /**
    * Supprimer une recette par ID
+   * Sauvegarde automatiquement vers Firestore
    */
-  deleteRecipe(id: string): boolean {
+  async deleteRecipe(id: string): Promise<boolean> {
     const index = this.recipes.findIndex((r) => r.id === id);
     if (index !== -1) {
       this.recipes.splice(index, 1);
       this.recipesSignal.set([...this.recipes]);
+      await this.deleteRecipeFromFirestore(id);
       return true;
     }
     return false;
@@ -186,32 +271,38 @@ export class RecipeService {
   /**
    * Sauvegarder une recette (création ou mise à jour)
    * Si l'ID existe déjà, met à jour la recette, sinon l'ajoute avec un ID généré
+   * Sauvegarde automatiquement vers Firestore
    * @param recipe La recette à sauvegarder
    * @returns true si mise à jour, false si création
    */
-  saveRecipe(recipe: RecipeModel): boolean {
+  async saveRecipe(recipe: RecipeModel): Promise<boolean> {
     let recipeToSave = recipe;
 
     if (!recipe.id) {
-      // Générer un ID basé sur la date et l'heure
-      const now = new Date();
-      const id = now.toISOString().replace(/[:.]/g, '-');
+      // Générer un ID unique
+      const id = this.generateId();
       recipeToSave = { ...recipe, id };
     }
 
     const existingIndex = this.recipes.findIndex((r) => r.id === recipeToSave.id);
+    let isUpdate: boolean;
 
     if (existingIndex !== -1) {
       // Mise à jour
       this.recipes[existingIndex] = recipeToSave;
-      this.recipesSignal.set([...this.recipes]);
-      return true;
+      isUpdate = true;
     } else {
       // Création
       this.recipes.push(recipeToSave);
-      this.recipesSignal.set([...this.recipes]);
-      return false;
+      isUpdate = false;
     }
+
+    this.recipesSignal.set([...this.recipes]);
+
+    // Sauvegarder vers Firestore (uniquement cette recette)
+    await this.saveRecipeToFirestore(recipeToSave);
+
+    return isUpdate;
   }
 
   /**
