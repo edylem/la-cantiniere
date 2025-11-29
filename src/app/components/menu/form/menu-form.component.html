@@ -8,54 +8,112 @@
   [dismissableMask]="true"
 >
   @if (editedMenuGroup) {
-    <div class="flex flex-column gap-3">
-      <!-- Date -->
-      <div>
-        <label for="menuDate">Date de début</label>
-        <p-datepicker
-          id="menuDate"
-          [(ngModel)]="editedMenuGroup.date"
-          [showIcon]="true"
-          dateFormat="dd/mm/yy"
-          class="w-full"
-        ></p-datepicker>
-      </div>
+  <div class="flex flex-column gap-3">
+    <!-- Date -->
+    <div>
+      <label for="menuDate">Date de début</label>
+      <p-datepicker
+        id="menuDate"
+        [(ngModel)]="editedMenuGroup.date"
+        [showIcon]="true"
+        dateFormat="dd/mm/yy"
+        class="w-full"
+      ></p-datepicker>
+    </div>
 
-      <!-- Liste des menus -->
-      <div class="menus-section">
-        <div class="menu-header">
-          <label>Repas</label>
-          <span class="cooked-label">Cuisiné</span>
-        </div>
-        <div class="menu-items">
-          @for (menu of editedMenuGroup.menus; track menu.num) {
-            <div class="menu-row" [class.empty]="!menu.recipeId">
-              <span class="menu-num">{{ menu.num }}.</span>
-              <span class="menu-title flex-1">{{ getRecipeTitle(menu.recipeId) }}</span>
-              @if (menu.recipeId) {
-                <p-checkbox
-                  [(ngModel)]="menu.done"
-                  [binary]="true"
-                ></p-checkbox>
-                <button
-                  pButton
-                  type="button"
-                  icon="pi pi-times"
-                  class="p-button-danger p-button-text p-button-sm"
-                  (click)="removeRecipe(menu)"
-                  title="Retirer du menu"
-                ></button>
-              }
-            </div>
+    <!-- Liste des menus -->
+    <div class="menus-section">
+      <div class="menu-header">
+        <label>Repas</label>
+        <span class="cooked-label">Cuisiné</span>
+      </div>
+      <div class="menu-items">
+        @for (menu of editedMenuGroup.menus; track menu.num) {
+        <div class="menu-row" [class.empty]="!menu.recipeId">
+          <span class="menu-num">{{ menu.num }}.</span>
+          <span class="menu-title flex-1">{{ getRecipeTitle(menu.recipeId) }}</span>
+          @if (menu.recipeId) {
+          <p-checkbox [(ngModel)]="menu.done" [binary]="true"></p-checkbox>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-eye"
+            class="p-button-text p-button-sm"
+            (click)="viewRecipe(menu.recipeId)"
+            title="Voir la recette"
+          ></button>
+          <button
+            pButton
+            type="button"
+            icon="pi pi-times"
+            class="p-button-danger p-button-text p-button-sm"
+            (click)="removeRecipe(menu)"
+            title="Retirer du menu"
+          ></button>
           }
         </div>
-      </div>
-
-      <!-- Boutons -->
-      <div class="flex gap-2 justify-content-end mt-3 pt-3 border-top-1 surface-border">
-        <button pButton label="Annuler" class="p-button-text" (click)="onCancel()"></button>
-        <button pButton label="Enregistrer" (click)="onSave()"></button>
+        }
       </div>
     </div>
+
+    <!-- Bouton Liste de courses -->
+    <div class="mt-3">
+      <button
+        pButton
+        type="button"
+        label="Liste de courses"
+        icon="pi pi-shopping-cart"
+        class="p-button-outlined w-full"
+        (click)="openShoppingList()"
+      ></button>
+    </div>
+
+    <!-- Boutons -->
+    <div class="flex gap-2 justify-content-end mt-3 pt-3 border-top-1 surface-border">
+      <button pButton label="Annuler" class="p-button-text" (click)="onCancel()"></button>
+      <button pButton label="Enregistrer" (click)="onSave()"></button>
+    </div>
+  </div>
+  }
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>
+
+<!-- Dialog pour afficher la recette -->
+<app-recipe-form
+  [(visible)]="showRecipeDialog"
+  [recipe]="selectedRecipe"
+  [isReadOnly]="true"
+></app-recipe-form>
+
+<!-- Dialog Liste de courses -->
+<p-dialog
+  [(visible)]="showShoppingDialog"
+  [modal]="true"
+  [style]="{ width: '400px', maxHeight: '80vh' }"
+  header="Liste de courses"
+  [dismissableMask]="true"
+>
+  @if (shoppingList.length === 0) {
+  <p class="text-center text-color-secondary">Aucun ingrédient dans le menu</p>
+  } @else {
+  <div class="shopping-list">
+    @for (item of shoppingList; track item.name + item.unit) {
+    <div class="shopping-item">
+      <span class="item-name">{{ item.name }}</span>
+      <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
+    </div>
+    }
+  </div>
+  <div class="mt-3 pt-3 border-top-1 surface-border">
+    <button
+      pButton
+      type="button"
+      label="Copier dans le presse-papier"
+      icon="pi pi-copy"
+      class="w-full"
+      (click)="copyShoppingListToClipboard()"
+    ></button>
+  </div>
   }
 </p-dialog>

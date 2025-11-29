@@ -1,18 +1,30 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { ConfirmationService } from 'primeng/api';
 import { MenuGroupModel, MenuModel } from '../../../models/menu.model';
 import { RecipeModel } from '../../../models/recipe.model';
 import { RecipeService } from '../../../services/recipe.service';
-import { MenuService } from '../../../services/menu.service';
+import { MenuService, ShoppingItem } from '../../../services/menu.service';
+import { RecipeFormComponent } from '../../recipe/form/recipe-form.component';
 
 @Component({
   selector: 'app-menu-form',
   standalone: true,
+  providers: [ConfirmationService],
   imports: [
     CommonModule,
     FormsModule,
@@ -20,6 +32,8 @@ import { MenuService } from '../../../services/menu.service';
     ButtonModule,
     CheckboxModule,
     DatePickerModule,
+    RecipeFormComponent,
+    ConfirmDialogModule,
   ],
   templateUrl: './menu-form.component.html',
   styleUrls: ['./menu-form.component.scss'],
@@ -34,9 +48,18 @@ export class MenuFormComponent implements OnInit, OnChanges {
   editedMenuGroup!: MenuGroupModel;
   recipes: RecipeModel[] = [];
 
+  // Pour afficher une recette
+  showRecipeDialog = false;
+  selectedRecipe?: RecipeModel;
+
+  // Pour la liste de courses
+  showShoppingDialog = false;
+  shoppingList: ShoppingItem[] = [];
+
   constructor(
     private recipeService: RecipeService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private confirmationService: ConfirmationService
   ) {}
 
   ngOnInit(): void {
@@ -108,10 +131,52 @@ export class MenuFormComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Supprime la recette d'un menu
+   * Supprime la recette d'un menu avec confirmation
    */
   removeRecipe(menu: MenuModel): void {
-    menu.recipeId = '';
-    menu.done = false;
+    const recipeTitle = this.getRecipeTitle(menu.recipeId);
+    this.confirmationService.confirm({
+      message: `Voulez-vous retirer "${recipeTitle}" du menu ?`,
+      header: 'Confirmation',
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Oui',
+      rejectLabel: 'Non',
+      accept: () => {
+        menu.recipeId = '';
+        menu.done = false;
+      },
+    });
+  }
+
+  /**
+   * Affiche la recette dans un dialog
+   */
+  viewRecipe(recipeId: string): void {
+    this.selectedRecipe = this.recipes.find((r) => r.id === recipeId);
+    if (this.selectedRecipe) {
+      this.showRecipeDialog = true;
+    }
+  }
+
+  /**
+   * Ouvre le dialog de la liste de courses
+   */
+  openShoppingList(): void {
+    this.shoppingList = this.menuService.generateShoppingList(this.editedMenuGroup);
+    this.showShoppingDialog = true;
+  }
+
+  /**
+   * Copie la liste de courses dans le presse-papier
+   */
+  copyShoppingListToClipboard(): void {
+    const text = this.shoppingList
+      .map((item) => `${item.name}: ${item.quantity} ${item.unit}`)
+      .join('\n');
+
+    navigator.clipboard.writeText(text).then(() => {
+      // Fermer le dialog après copie (optionnel)
+      this.showShoppingDialog = false;
+    });
   }
 }

@@ -20,7 +20,14 @@ import { MenuService } from '../../../services/menu.service';
 @Component({
   selector: 'app-recipe-card',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, ConfirmDialogModule, ToastModule, FaIconComponent],
+  imports: [
+    CommonModule,
+    CardModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    ToastModule,
+    FaIconComponent,
+  ],
   providers: [ConfirmationService, MessageService],
   templateUrl: './recipe-card.component.html',
   styleUrls: ['./recipe-card.component.scss'],
@@ -86,25 +93,25 @@ export class RecipeCardComponent {
    */
   onSendToMenu(): void {
     const menuGroups = this.menuService.getMenuGroups();
-    
+
     if (menuGroups.length === 0) {
       this.messageService.add({
         severity: 'warn',
         summary: 'Aucun menu',
-        detail: 'Aucun menu n\'existe. Créez d\'abord un menu.',
+        detail: "Aucun menu n'existe. Créez d'abord un menu.",
         life: 4000,
       });
       return;
     }
 
     // Trouver le dernier menu (le plus récent)
-    const sortedGroups = [...menuGroups].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
+    const sortedGroups = [...menuGroups].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
     const lastGroup = sortedGroups[0];
 
     // Trouver la première place vide (recipeId vide)
-    const emptySlot = lastGroup.menus.find(m => !m.recipeId || m.recipeId === '');
+    const emptySlot = lastGroup.menus.find((m) => !m.recipeId || m.recipeId === '');
 
     if (!emptySlot) {
       this.messageService.add({
@@ -118,7 +125,9 @@ export class RecipeCardComponent {
 
     // Demander confirmation
     this.confirmationService.confirm({
-      message: `Ajouter "${this.recipe.title}" au menu du ${this.formatDate(lastGroup.date)} (emplacement ${emptySlot.num}) ?`,
+      message: `Ajouter "${this.recipe.title}" au menu du ${this.formatDate(
+        lastGroup.date
+      )} (emplacement ${emptySlot.num}) ?`,
       header: 'Envoyer au menu',
       icon: 'pi pi-calendar-plus',
       acceptLabel: 'Ajouter',
@@ -139,7 +148,7 @@ export class RecipeCardComponent {
             this.messageService.add({
               severity: 'error',
               summary: 'Erreur',
-              detail: 'Impossible d\'ajouter au menu.',
+              detail: "Impossible d'ajouter au menu.",
               life: 4000,
             });
           },

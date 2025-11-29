@@ -2,7 +2,18 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { MenuGroupModel, MenuModel } from '../models/menu.model';
+import { IngredientModel } from '../models/ingredient.model';
 import { FirestoreService } from './firestore.service';
+import { RecipeService } from './recipe.service';
+
+/**
+ * Interface pour un élément de la liste de courses
+ */
+export interface ShoppingItem {
+  name: string;
+  quantity: number;
+  unit: string;
+}
 
 // Interface pour le document Firestore
 interface MenuGroupDocument {
@@ -20,7 +31,7 @@ export class MenuService {
   private cache: MenuGroupModel[] = [];
   private isLoaded = false;
 
-  constructor(private firestoreService: FirestoreService) {}
+  constructor(private firestoreService: FirestoreService, private recipeService: RecipeService) {}
 
   /**
    * Indique si les données sont chargées
@@ -41,7 +52,12 @@ export class MenuService {
    */
   private generateId(): string {
     const now = new Date();
-    return 'menu_' + now.toISOString().replace(/[:.]/g, '-') + '-' + Math.random().toString(36).substr(2, 9);
+    return (
+      'menu_' +
+      now.toISOString().replace(/[:.]/g, '-') +
+      '-' +
+      Math.random().toString(36).substr(2, 9)
+    );
   }
 
   /**
@@ -124,7 +140,11 @@ export class MenuService {
    * @param numberOfMeals Nombre de repas prévus
    * @returns Observable<MenuGroupModel> Le groupe créé
    */
-  createWithMeals(menus: MenuModel[], date: Date, numberOfMeals: number): Observable<MenuGroupModel> {
+  createWithMeals(
+    menus: MenuModel[],
+    date: Date,
+    numberOfMeals: number
+  ): Observable<MenuGroupModel> {
     const id = this.generateId();
     const menuGroup: MenuGroupModel = {
       id,
@@ -196,6 +216,49 @@ export class MenuService {
 
     menu.done = done;
     return this.saveToFirestore(group).pipe(map(() => true));
+  }
+
+  /**
+   * Génère la liste de courses pour un groupe de menus
+   * Additionne les quantités des ingrédients identiques (même nom + même unité)
+   * @param menuGroup Le groupe de menus
+   * @returns Liste de courses agrégée
+   */
+  generateShoppingList(menuGroup: MenuGroupModel): ShoppingItem[] {
+    const recipes = this.recipeService.getRecipes();
+    const itemsMap = new Map<string, ShoppingItem>();
+
+    // Parcourir tous les menus qui ont une recette assignée
+    for (const menu of menuGroup.menus) {
+      if (!menu.recipeId) continue;
+
+      const recipe = recipes.find((r) => r.id === menu.recipeId);
+      if (!recipe) continue;
+
+      // Parcourir tous les ingrédients de la recette
+      for (const ingredient of recipe.ingredients) {
+        // Clé unique: nom + unité (en minuscules pour éviter les doublons)
+        const key = `${ingredient.name.toLowerCase()}|${ingredient.unit.toLowerCase()}`;
+
+        if (itemsMap.has(key)) {
+          // Additionner la quantité
+          const existing = itemsMap.get(key)!;
+          existing.quantity += ingredient.quantity;
+        } else {
+          // Créer un nouvel élément
+          itemsMap.set(key, {
+            name: ingredient.name,
+            quantity: ingredient.quantity,
+            unit: ingredient.unit,
+          });
+        }
+      }
+    }
+
+    // Convertir en tableau et trier par nom
+    return Array.from(itemsMap.values()).sort((a, b) =>
+      a.name.toLowerCase().localeCompare(b.name.toLowerCase())
+    );
   }
 
   /**
