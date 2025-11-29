@@ -39,9 +39,21 @@
     <button
       pButton
       type="button"
+      class="p-button-outlined p-button-success"
+      (click)="onSendToMenu()"
+      title="Envoyer au menu"
+    >
+      <fa-icon [icon]="faUtensils"></fa-icon>
+    </button>
+    <button
+      pButton
+      type="button"
       icon="pi pi-trash"
       class="p-button-outlined p-button-danger"
       (click)="onDelete()"
     ></button>
   </div>
 </p-card>
+
+<p-confirmDialog></p-confirmDialog>
+<p-toast></p-toast>

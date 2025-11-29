@@ -1,0 +1,59 @@
+<div class="menu-list-container">
+  <div class="header">
+    <h2>Mes Menus</h2>
+    <button pButton label="Ajouter un menu" icon="pi pi-plus" (click)="onAddMenu()"></button>
+  </div>
+
+  @if (hasMenus) {
+  <div class="menu-groups">
+    @for (group of menuGroups; track group.id) {
+    <app-menu-group-card [menuGroup]="group"></app-menu-group-card>
+    }
+  </div>
+  } @else {
+  <div class="empty-state">
+    <i class="pi pi-calendar-times"></i>
+    <p>Aucun menu créé pour le moment.</p>
+  </div>
+  }
+</div>
+
+<!-- Dialog pour ajouter un menu -->
+<p-dialog
+  [(visible)]="showAddDialog"
+  [modal]="true"
+  [style]="{ width: '350px' }"
+  header="Nouveau menu"
+  [dismissableMask]="true"
+>
+  <div class="flex flex-column gap-3">
+    <div>
+      <label for="menuDate">Date de début</label>
+      <p-datepicker
+        id="menuDate"
+        [(ngModel)]="newMenuDate"
+        [appendTo]="'body'"
+        [showIcon]="true"
+        dateFormat="dd/mm/yy"
+        class="w-full"
+      ></p-datepicker>
+    </div>
+
+    <div>
+      <label for="mealsCount">Nombre de repas</label>
+      <p-inputnumber
+        id="mealsCount"
+        [(ngModel)]="newMenuMealsCount"
+        [min]="1"
+        [max]="31"
+        [showButtons]="true"
+        class="w-full"
+      ></p-inputnumber>
+    </div>
+
+    <div class="flex gap-2 justify-content-end mt-3">
+      <button pButton label="Annuler" class="p-button-text" (click)="onCancelAdd()"></button>
+      <button pButton label="Créer" (click)="onCreateMenu()"></button>
+    </div>
+  </div>
+</p-dialog>

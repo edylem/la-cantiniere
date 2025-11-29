@@ -1,0 +1,47 @@
+<p-card>
+  <ng-template pTemplate="header">
+    <div class="card-header">
+      <span>{{ formatDate(menuGroup.date) }}</span>
+      <div class="header-actions">
+        <button
+          pButton
+          type="button"
+          icon="pi pi-pencil"
+          class="p-button-text p-button-sm"
+          (click)="onEdit()"
+          title="Modifier"
+        ></button>
+        <button
+          pButton
+          type="button"
+          icon="pi pi-trash"
+          class="p-button-danger p-button-text p-button-sm"
+          (click)="onDelete()"
+          title="Supprimer"
+        ></button>
+      </div>
+    </div>
+  </ng-template>
+  <div class="menu-list">
+    @for (menu of menuGroup.menus; track menu.num) {
+      <div class="menu-item" [class.done]="menu.done">
+        <span class="menu-check">
+          @if (menu.done) {
+            <i class="pi pi-check-circle"></i>
+          } @else {
+            <i class="pi pi-circle"></i>
+          }
+        </span>
+        <span class="menu-num">{{ menu.num }}.</span>
+        <span class="menu-title">{{ getRecipeTitle(menu.recipeId) }}</span>
+      </div>
+    }
+  </div>
+</p-card>
+
+<app-menu-form
+  [(visible)]="showEditDialog"
+  [menuGroup]="menuGroup"
+></app-menu-form>
+
+<p-confirmDialog></p-confirmDialog>

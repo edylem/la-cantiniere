@@ -50,11 +50,13 @@ export class RecipeService {
    * @returns Observable avec le nombre de recettes chargées
    */
   load(): Observable<number> {
+    console.log('[RecipeService] Début du chargement des recettes...');
     return this.firestoreService
       .getAllDocuments<RecipeDocument>(RecipeService.COLLECTION_NAME)
       .pipe(
-        map((docs) =>
-          docs.map((doc) => {
+        map((docs) => {
+          console.log(`[RecipeService] ${docs.length} documents récupérés depuis Firestore`);
+          return docs.map((doc) => {
             const recipe = doc.data.data;
             return {
               ...recipe,
@@ -65,11 +67,12 @@ export class RecipeService {
                 ? [recipe.season]
                 : undefined,
             };
-          })
-        ),
+          });
+        }),
         tap((recipes) => {
           this.cache = recipes;
           this.isLoaded = true;
+          console.log(`[RecipeService] ✅ ${recipes.length} recettes chargées en cache`);
         }),
         map((recipes) => recipes.length)
       );

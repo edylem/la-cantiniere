@@ -1,5 +1,6 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Menu, MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
 import { MenuItem } from 'primeng/api';
@@ -20,13 +21,30 @@ export class TitleBarComponent {
 
   menuItems: MenuItem[] = [
     {
+      label: 'Recettes',
+      icon: 'pi pi-book',
+      command: () => this.router.navigate(['/recipes']),
+    },
+    {
+      label: 'Menus',
+      icon: 'pi pi-calendar',
+      command: () => this.router.navigate(['/menus']),
+    },
+    {
+      separator: true,
+    },
+    {
       label: 'Exporter (JSON)',
       icon: 'pi pi-download',
       command: () => this.onDownload(),
     },
   ];
 
-  constructor(private recipeService: RecipeService, private messageService: MessageService) {}
+  constructor(
+    private recipeService: RecipeService,
+    private messageService: MessageService,
+    private router: Router
+  ) {}
 
   onDownload(): void {
     try {
