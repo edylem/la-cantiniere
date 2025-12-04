@@ -136,7 +136,7 @@ export class MenuFormComponent implements OnInit, OnChanges {
   removeRecipe(menu: MenuModel): void {
     const recipeTitle = this.getRecipeTitle(menu.recipeId);
     this.confirmationService.confirm({
-      message: `Voulez-vous retirer "${recipeTitle}" du menu ?`,
+      message: `Voulez-vous retirer "${recipeTitle}" des idées de recettes ?`,
       header: 'Confirmation',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Oui',
@@ -156,6 +156,41 @@ export class MenuFormComponent implements OnInit, OnChanges {
     if (this.selectedRecipe) {
       this.showRecipeDialog = true;
     }
+  }
+
+  /**
+   * Rafraîchit l'idée de repas avec une nouvelle suggestion aléatoire
+   */
+  refreshRecipe(menu: MenuModel): void {
+    const currentTitle = menu.recipeId ? this.getRecipeTitle(menu.recipeId) : 'vide';
+    const message = menu.recipeId
+      ? `Voulez-vous remplacer "${currentTitle}" par une nouvelle idée de repas ?`
+      : 'Voulez-vous suggérer une recette pour ce repas ?';
+
+    this.confirmationService.confirm({
+      message,
+      header: 'Confirmation',
+      icon: 'pi pi-refresh',
+      acceptLabel: 'Oui',
+      rejectLabel: 'Non',
+      accept: () => {
+        // Obtenir les IDs des recettes déjà utilisées dans ce groupe
+        const usedRecipeIds = this.editedMenuGroup.menus
+          .filter((m) => m.recipeId && m.num !== menu.num)
+          .map((m) => m.recipeId);
+
+        // Suggérer une nouvelle recette qui n'est pas déjà utilisée
+        const suggestions = this.menuService.suggestRandomRecipes(usedRecipeIds.length + 5);
+        const newRecipeId = suggestions.find(
+          (id) => !usedRecipeIds.includes(id) && id !== menu.recipeId
+        );
+
+        if (newRecipeId) {
+          menu.recipeId = newRecipeId;
+          menu.done = false;
+        }
+      },
+    });
   }
 
   /**

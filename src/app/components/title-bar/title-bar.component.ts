@@ -3,16 +3,17 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Menu, MenuModule } from 'primeng/menu';
 import { ButtonModule } from 'primeng/button';
-import { MenuItem } from 'primeng/api';
+import { MenuItem, ConfirmationService } from 'primeng/api';
 import { RecipeService } from '../../services/recipe.service';
 import { MessageService } from 'primeng/api';
 import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 @Component({
   selector: 'app-title-bar',
   standalone: true,
-  imports: [CommonModule, MenuModule, ButtonModule, ToastModule],
-  providers: [MessageService],
+  imports: [CommonModule, MenuModule, ButtonModule, ToastModule, ConfirmDialogModule],
+  providers: [MessageService, ConfirmationService],
   templateUrl: './title-bar.component.html',
   styleUrls: ['./title-bar.component.scss'],
 })
@@ -26,7 +27,7 @@ export class TitleBarComponent {
       command: () => this.router.navigate(['/recipes']),
     },
     {
-      label: 'Menus',
+      label: 'Idées de Repas',
       icon: 'pi pi-calendar',
       command: () => this.router.navigate(['/menus']),
     },
@@ -38,11 +39,17 @@ export class TitleBarComponent {
       icon: 'pi pi-download',
       command: () => this.onDownload(),
     },
+    {
+      label: 'Importer (JSON)',
+      icon: 'pi pi-upload',
+      command: () => this.onImport(),
+    },
   ];
 
   constructor(
     private recipeService: RecipeService,
     private messageService: MessageService,
+    private confirmationService: ConfirmationService,
     private router: Router
   ) {}
 
@@ -63,5 +70,36 @@ export class TitleBarComponent {
         life: 4000,
       });
     }
+  }
+
+  onImport(): void {
+    this.confirmationService.confirm({
+      message:
+        'Attention : toutes les recettes existantes seront supprimées et remplacées par celles du fichier importé. Continuer ?',
+      header: "Confirmation d'import",
+      icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Oui, importer',
+      rejectLabel: 'Annuler',
+      accept: () => {
+        this.recipeService.importRecipes().subscribe({
+          next: (count) => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Import réussi',
+              detail: `${count} recettes importées`,
+              life: 3000,
+            });
+          },
+          error: (err: any) => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Erreur',
+              detail: err?.message || 'Erreur import',
+              life: 4000,
+            });
+          },
+        });
+      },
+    });
   }
 }

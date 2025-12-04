@@ -84,3 +84,74 @@ p-floatlabel {
     height: 1.75rem !important;
   }
 }
+
+// Styles pour la vue lecture seule
+.recipe-view {
+  .recipe-title {
+    margin: 0 0 1rem 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--p-text-color);
+  }
+
+  .recipe-image {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+  }
+
+  .recipe-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 0.75rem;
+    background-color: var(--p-surface-100);
+    border-radius: 6px;
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.9rem;
+      color: var(--p-text-secondary-color);
+
+      i {
+        color: var(--p-primary-color);
+      }
+    }
+  }
+
+  .recipe-section {
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0 0 0.75rem 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--p-primary-color);
+      border-bottom: 2px solid var(--p-primary-color);
+      padding-bottom: 0.25rem;
+    }
+  }
+
+  .ingredients-list {
+    margin: 0;
+    padding-left: 1.25rem;
+    list-style-type: disc;
+
+    li {
+      margin-bottom: 0.5rem;
+      font-size: 0.95rem;
+    }
+  }
+
+  .recipe-description {
+    white-space: pre-wrap;
+    line-height: 1.6;
+    margin: 0;
+    font-size: 0.95rem;
+  }
+}

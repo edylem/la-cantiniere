@@ -10,7 +10,65 @@
     isReadOnly ? 'Voir la recette' : isEditMode ? 'Modifier la recette' : 'Nouvelle recette'
   "
 >
-  <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+  <!-- Mode lecture seule : affichage direct sans champs de formulaire -->
+  <ng-container *ngIf="isReadOnly && recipe">
+    <div class="recipe-view">
+      <!-- Titre -->
+      <h2 class="recipe-title">{{ recipe.title }}</h2>
+
+      <!-- Image -->
+      <img
+        *ngIf="recipe.image"
+        [src]="recipe.image"
+        alt="Image de la recette"
+        class="recipe-image"
+      />
+
+      <!-- Métadonnées -->
+      <div class="recipe-meta">
+        <span *ngIf="recipe.personnes" class="meta-item">
+          <i class="pi pi-users"></i> {{ recipe.personnes }} pers.
+        </span>
+        <span *ngIf="recipe.prepTime" class="meta-item">
+          <i class="pi pi-clock"></i> {{ recipe.prepTime }} min
+        </span>
+        <span *ngIf="recipe.cost" class="meta-item">
+          <i class="pi pi-euro"></i> {{ recipe.cost | number:'1.2-2' }}
+        </span>
+        <span *ngIf="recipe.season && recipe.season.length > 0" class="meta-item">
+          <i class="pi pi-sun"></i> {{ recipe.season.join(', ') }}
+        </span>
+        <span *ngIf="recipe.category && recipe.category.length > 0" class="meta-item">
+          <i class="pi pi-tag"></i> {{ recipe.category.join(', ') }}
+        </span>
+      </div>
+
+      <!-- Ingrédients -->
+      <div class="recipe-section">
+        <h3>Ingrédients</h3>
+        <ul class="ingredients-list">
+          <li *ngFor="let ing of recipe.ingredients">
+            <strong>{{ ing.name }}</strong>
+            <span *ngIf="ing.quantity || ing.unit"> : {{ ing.quantity }} {{ ing.unit }}</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Description -->
+      <div class="recipe-section">
+        <h3>Préparation</h3>
+        <p class="recipe-description">{{ recipe.description }}</p>
+      </div>
+
+      <!-- Bouton Fermer -->
+      <div class="flex justify-content-end mt-3">
+        <p-button type="button" label="Fermer" [text]="true" (click)="onCancel()"></p-button>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Mode édition : formulaire -->
+  <form *ngIf="!isReadOnly" [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
     <div class="grid gap-2">
       <!-- Titre -->
       <div class="col-12">
@@ -20,7 +78,6 @@
           id="title"
           formControlName="title"
           class="w-full"
-          [disabled]="isReadOnly"
         />
       </div>
 
@@ -29,7 +86,6 @@
         <label>Image</label>
         <div class="flex gap-2 align-items-center">
           <p-button
-            *ngIf="!isReadOnly"
             type="button"
             label="Sélectionner une image"
             icon="pi pi-image"
@@ -66,24 +122,20 @@
                 formControlName="name"
                 placeholder="Nom *"
                 class="ingredient-name"
-                [disabled]="isReadOnly"
               />
               <p-inputnumber
                 formControlName="quantity"
                 [min]="0"
                 placeholder="Qté"
                 class="ingredient-qty"
-                [disabled]="isReadOnly"
               ></p-inputnumber>
               <input
                 pInputText
                 formControlName="unit"
                 placeholder="Unité"
                 class="ingredient-unit"
-                [disabled]="isReadOnly"
               />
               <p-button
-                *ngIf="!isReadOnly"
                 type="button"
                 icon="pi pi-trash"
                 severity="danger"
@@ -94,7 +146,6 @@
           </div>
 
           <p-button
-            *ngIf="!isReadOnly"
             type="button"
             label="Ajouter"
             icon="pi pi-plus"
@@ -114,7 +165,6 @@
           formControlName="description"
           rows="4"
           class="w-full"
-          [disabled]="isReadOnly"
         ></textarea>
       </div>
 
@@ -126,7 +176,6 @@
           formControlName="personnes"
           [min]="1"
           class="w-full"
-          [disabled]="isReadOnly"
         ></p-inputnumber>
       </div>
 
@@ -141,7 +190,6 @@
           optionValue="value"
           placeholder="Choisir les saisons"
           class="w-full"
-          [disabled]="isReadOnly"
         ></p-multiSelect>
       </div>
 
@@ -156,7 +204,6 @@
           optionValue="value"
           placeholder="Choisir les catégories"
           class="w-full"
-          [disabled]="isReadOnly"
         ></p-multiSelect>
       </div>
 
@@ -169,7 +216,6 @@
           [min]="0"
           suffix=" min"
           class="w-full"
-          [disabled]="isReadOnly"
         ></p-inputnumber>
       </div>
 
@@ -184,27 +230,17 @@
           [maxFractionDigits]="2"
           prefix="€"
           class="w-full"
-          [disabled]="isReadOnly"
         ></p-inputnumber>
       </div>
 
       <!-- Actions -->
       <div class="col-12 flex gap-2 justify-content-end">
+        <p-button type="button" label="Annuler" [text]="true" (click)="onCancel()"></p-button>
         <p-button
-          *ngIf="isReadOnly"
-          type="button"
-          label="Fermer"
-          [text]="true"
-          (click)="onCancel()"
+          type="submit"
+          [label]="isEditMode ? 'Enregistrer' : 'Créer'"
+          [disabled]="!recipeForm.valid"
         ></p-button>
-        <ng-container *ngIf="!isReadOnly">
-          <p-button type="button" label="Annuler" [text]="true" (click)="onCancel()"></p-button>
-          <p-button
-            type="submit"
-            [label]="isEditMode ? 'Enregistrer' : 'Créer'"
-            [disabled]="!recipeForm.valid"
-          ></p-button>
-        </ng-container>
       </div>
     </div>
   </form>

@@ -57,19 +57,22 @@ export class MenuListComponent {
   }
 
   /**
-   * Crée un nouveau groupe de menus
+   * Crée un nouveau groupe de menus avec des recettes aléatoires
    */
   onCreateMenu(): void {
     if (this.newMenuMealsCount < 1) {
       return;
     }
 
-    // Créer les menus vides
+    // Obtenir des suggestions de recettes aléatoires
+    const suggestedRecipeIds = this.menuService.suggestRandomRecipes(this.newMenuMealsCount);
+
+    // Créer les menus avec les recettes suggérées
     const menus: MenuModel[] = [];
     for (let i = 1; i <= this.newMenuMealsCount; i++) {
       menus.push({
         num: i,
-        recipeId: '',
+        recipeId: suggestedRecipeIds[i - 1] || '',
         done: false,
       });
     }

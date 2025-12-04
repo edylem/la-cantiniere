@@ -1,7 +1,7 @@
 <div class="menu-list-container">
   <div class="header">
-    <h2>Mes Menus</h2>
-    <button pButton label="Ajouter un menu" icon="pi pi-plus" (click)="onAddMenu()"></button>
+    <h2>Mes Idées de Repas</h2>
+    <button pButton label="Ajouter des idées" icon="pi pi-plus" (click)="onAddMenu()"></button>
   </div>
 
   @if (hasMenus) {
@@ -13,17 +13,17 @@
   } @else {
   <div class="empty-state">
     <i class="pi pi-calendar-times"></i>
-    <p>Aucun menu créé pour le moment.</p>
+    <p>Aucune idée de repass créée pour le moment.</p>
   </div>
   }
 </div>
 
-<!-- Dialog pour ajouter un menu -->
+<!-- Dialog pour ajouter des idées de recettes -->
 <p-dialog
   [(visible)]="showAddDialog"
   [modal]="true"
   [style]="{ width: '350px' }"
-  header="Nouveau menu"
+  header="Nouvelles idées de recettes"
   [dismissableMask]="true"
 >
   <div class="flex flex-column gap-3">

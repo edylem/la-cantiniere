@@ -25,13 +25,6 @@
   <div class="menu-list">
     @for (menu of menuGroup.menus; track menu.num) {
     <div class="menu-item" [class.done]="menu.done">
-      <span class="menu-check">
-        @if (menu.done) {
-        <i class="pi pi-check-circle"></i>
-        } @else {
-        <i class="pi pi-circle"></i>
-        }
-      </span>
       <span class="menu-num">{{ menu.num }}.</span>
       <span class="menu-title">{{ getRecipeTitle(menu.recipeId) }}</span>
     </div>

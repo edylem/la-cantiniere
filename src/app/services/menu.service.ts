@@ -219,6 +219,63 @@ export class MenuService {
   }
 
   /**
+   * Suggère des recettes aléatoires en évitant celles faites le dernier mois
+   * @param count Nombre de recettes à suggérer
+   * @returns Liste d'IDs de recettes
+   */
+  suggestRandomRecipes(count: number): string[] {
+    const recipes = this.recipeService.getRecipes();
+    if (recipes.length === 0) return [];
+
+    // Calculer la date d'il y a un mois
+    const oneMonthAgo = new Date();
+    oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+
+    // Trouver les recettes faites le dernier mois
+    const recentlyDoneRecipeIds = new Set<string>();
+    for (const menuGroup of this.cache) {
+      const menuDate = new Date(menuGroup.date);
+      if (menuDate >= oneMonthAgo) {
+        for (const menu of menuGroup.menus) {
+          if (menu.done && menu.recipeId) {
+            recentlyDoneRecipeIds.add(menu.recipeId);
+          }
+        }
+      }
+    }
+
+    // Séparer les recettes en deux groupes: non faites récemment et faites récemment
+    const notRecentlyDone = recipes.filter((r) => !recentlyDoneRecipeIds.has(r.id));
+    const recentlyDone = recipes.filter((r) => recentlyDoneRecipeIds.has(r.id));
+
+    // Mélanger les tableaux (Fisher-Yates shuffle)
+    const shuffle = <T>(array: T[]): T[] => {
+      const result = [...array];
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    };
+
+    const shuffledNotRecent = shuffle(notRecentlyDone);
+    const shuffledRecent = shuffle(recentlyDone);
+
+    // Prendre d'abord les non faites récemment, puis compléter avec les autres si nécessaire
+    const selected: string[] = [];
+    for (const recipe of shuffledNotRecent) {
+      if (selected.length >= count) break;
+      selected.push(recipe.id);
+    }
+    for (const recipe of shuffledRecent) {
+      if (selected.length >= count) break;
+      selected.push(recipe.id);
+    }
+
+    return selected;
+  }
+
+  /**
    * Génère la liste de courses pour un groupe de menus
    * Additionne les quantités des ingrédients identiques (même nom + même unité)
    * @param menuGroup Le groupe de menus

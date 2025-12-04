@@ -4,7 +4,7 @@
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
   [style]="{ width: '500px' }"
-  [header]="'Modifier le menu'"
+  [header]="'Modifier les idées de recettes'"
   [dismissableMask]="true"
 >
   @if (editedMenuGroup) {
@@ -21,7 +21,7 @@
       ></p-datepicker>
     </div>
 
-    <!-- Liste des menus -->
+    <!-- Liste des idées -->
     <div class="menus-section">
       <div class="menu-header">
         <label>Repas</label>
@@ -37,6 +37,14 @@
           <button
             pButton
             type="button"
+            icon="pi pi-refresh"
+            class="p-button-text p-button-sm"
+            (click)="refreshRecipe(menu)"
+            title="Changer l'idée de repas"
+          ></button>
+          <button
+            pButton
+            type="button"
             icon="pi pi-eye"
             class="p-button-text p-button-sm"
             (click)="viewRecipe(menu.recipeId)"
@@ -48,7 +56,16 @@
             icon="pi pi-times"
             class="p-button-danger p-button-text p-button-sm"
             (click)="removeRecipe(menu)"
-            title="Retirer du menu"
+            title="Retirer l'idée"
+          ></button>
+          } @else {
+          <button
+            pButton
+            type="button"
+            icon="pi pi-refresh"
+            class="p-button-text p-button-sm"
+            (click)="refreshRecipe(menu)"
+            title="Suggérer une recette"
           ></button>
           }
         </div>

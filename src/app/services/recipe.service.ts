@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, tap, switchMap } from 'rxjs/operators';
 import { RecipeModel } from '../models/recipe.model';
 import { FirestoreService } from './firestore.service';
 
@@ -214,6 +214,106 @@ export class RecipeService {
     // Nettoyer
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+  }
+
+  /**
+   * Importe des recettes depuis un fichier JSON
+   * Supprime toutes les recettes existantes et les remplace par les nouvelles
+   * Utilise les IDs présents dans le fichier
+   * @returns Observable<number> Le nombre de recettes importées
+   */
+  importRecipes(): Observable<number> {
+    return new Observable((subscriber) => {
+      // Créer un input file invisible
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json,application/json';
+
+      input.onchange = async (event: Event) => {
+        const target = event.target as HTMLInputElement;
+        const file = target.files?.[0];
+
+        if (!file) {
+          subscriber.error(new Error('Aucun fichier sélectionné'));
+          return;
+        }
+
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+
+          // Vérifier que c'est un tableau
+          if (!Array.isArray(data)) {
+            subscriber.error(new Error('Le fichier JSON doit contenir un tableau de recettes'));
+            return;
+          }
+
+          // Valider et normaliser les recettes (générer un ID si absent)
+          const validRecipes = data
+            .filter(
+              (item: any) =>
+                item && typeof item.title === 'string' && Array.isArray(item.ingredients)
+            )
+            .map((item: any) => ({
+              ...item,
+              id: item.id && typeof item.id === 'string' ? item.id : this.generateId(),
+              season: Array.isArray(item.season)
+                ? item.season
+                : item.season
+                ? [item.season]
+                : undefined,
+            })) as RecipeModel[];
+
+          if (validRecipes.length === 0) {
+            subscriber.error(new Error('Aucune recette valide trouvée dans le fichier'));
+            return;
+          }
+
+          // 1. Supprimer toutes les recettes existantes de Firestore
+          const deleteObservables = this.cache.map((recipe) =>
+            this.deleteRecipeFromFirestore(recipe.id)
+          );
+
+          const deleteAll$ = deleteObservables.length > 0 ? forkJoin(deleteObservables) : of([]);
+
+          // 2. Après suppression, sauvegarder les nouvelles recettes
+          deleteAll$
+            .pipe(
+              switchMap(() => {
+                // Vider le cache
+                this.cache = [];
+
+                // Sauvegarder toutes les nouvelles recettes
+                const saveObservables = validRecipes.map((recipe) =>
+                  this.saveRecipeToFirestore(recipe)
+                );
+
+                return saveObservables.length > 0 ? forkJoin(saveObservables) : of([]);
+              })
+            )
+            .subscribe({
+              next: () => {
+                // Mettre à jour le cache avec les nouvelles recettes
+                this.cache = validRecipes;
+                subscriber.next(validRecipes.length);
+                subscriber.complete();
+              },
+              error: (err) => {
+                subscriber.error(err);
+              },
+            });
+        } catch (error) {
+          subscriber.error(new Error(`Erreur lors de la lecture du fichier: ${error}`));
+        }
+      };
+
+      input.onerror = () => {
+        subscriber.error(new Error('Erreur lors de la sélection du fichier'));
+      };
+
+      // Déclencher le sélecteur
+      input.click();
+    });
   }
 
   /**
