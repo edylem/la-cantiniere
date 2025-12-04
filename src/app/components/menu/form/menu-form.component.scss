@@ -16,6 +16,14 @@
     margin-bottom: 0;
   }
 
+  .personnes-label {
+    font-weight: 500;
+    font-size: 0.875rem;
+    color: var(--p-text-secondary-color);
+    width: 4rem;
+    text-align: center;
+  }
+
   .cooked-label {
     font-weight: 500;
     font-size: 0.875rem;
@@ -57,6 +65,22 @@
 
   .flex-1 {
     flex: 1;
+  }
+
+  .personnes-field {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--p-text-secondary-color);
+
+    i {
+      font-size: 0.875rem;
+    }
+
+    ::ng-deep .p-inputnumber-input {
+      padding: 0.25rem;
+      font-size: 0.875rem;
+    }
   }
 }
 

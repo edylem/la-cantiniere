@@ -1,4 +1,9 @@
 <p-card [header]="recipe.title">
+  <!-- Badge jours depuis dernière cuisson -->
+  <span *ngIf="getDaysSinceLastCooked() !== null" class="days-badge">
+    {{ getDaysSinceLastCooked() }}jr
+  </span>
+
   <ng-container *ngIf="recipe.image">
     <img class="recipe-image" [src]="recipe.image" [alt]="recipe.title" />
   </ng-container>

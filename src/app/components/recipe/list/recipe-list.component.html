@@ -1,7 +1,12 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="flex justify-content-center gap-2 mt-3 mb-3">
+<div class="flex justify-content-center align-items-center gap-2 mt-3 mb-3 flex-wrap">
+  <!-- Filtre rapide -->
+  <span class="p-input-icon-left quick-filter">
+    <i class="pi pi-search"></i>
+    <input pInputText type="text" [(ngModel)]="quickFilter" placeholder="Filtre rapide..." />
+  </span>
   <button
     pButton
     type="button"

@@ -26,6 +26,9 @@
 
       <!-- Métadonnées -->
       <div class="recipe-meta">
+        <span *ngIf="getLastCookedDate()" class="meta-item last-cooked">
+          <i class="pi pi-calendar-check"></i> Fait la dernière fois le {{ getLastCookedDate() }}
+        </span>
         <span *ngIf="recipe.personnes" class="meta-item">
           <i class="pi pi-users"></i> {{ recipe.personnes }} pers.
         </span>
@@ -33,7 +36,7 @@
           <i class="pi pi-clock"></i> {{ recipe.prepTime }} min
         </span>
         <span *ngIf="recipe.cost" class="meta-item">
-          <i class="pi pi-euro"></i> {{ recipe.cost | number:'1.2-2' }}
+          <i class="pi pi-euro"></i> {{ recipe.cost | number : '1.2-2' }}
         </span>
         <span *ngIf="recipe.season && recipe.season.length > 0" class="meta-item">
           <i class="pi pi-sun"></i> {{ recipe.season.join(', ') }}
@@ -73,12 +76,7 @@
       <!-- Titre -->
       <div class="col-12">
         <label for="title">Titre *</label>
-        <input
-          pInputText
-          id="title"
-          formControlName="title"
-          class="w-full"
-        />
+        <input pInputText id="title" formControlName="title" class="w-full" />
       </div>
 
       <!-- Image -->

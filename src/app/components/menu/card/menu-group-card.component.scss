@@ -1,50 +1,65 @@
+::ng-deep .p-card {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1rem;
   font-weight: 600;
+  background: linear-gradient(90deg, var(--p-primary-color) 0%, var(--p-primary-400) 100%);
+  color: white;
 
   .header-actions {
     display: flex;
     gap: 0.25rem;
+
+    button {
+      color: white !important;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+      }
+    }
   }
 }
 
 .menu-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.25rem;
+  padding: 0.5rem;
+  background-color: var(--p-surface-50);
 }
 
 .menu-item {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
   transition: background-color 0.2s;
+  background-color: white;
 
   &:hover {
     background-color: var(--p-surface-100);
   }
 
   &.done {
+    background-color: var(--p-green-50);
+
     .menu-title {
       text-decoration: line-through;
       color: var(--p-text-muted-color);
     }
 
-    .menu-check i {
-      color: var(--p-primary-color);
+    .menu-num {
+      color: var(--p-green-600);
     }
-  }
-}
-
-.menu-check {
-  i {
-    font-size: 1rem;
-    color: var(--p-text-muted-color);
   }
 }
 
@@ -56,4 +71,19 @@
 
 .menu-title {
   flex: 1;
+}
+
+.menu-personnes {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  color: var(--p-text-secondary-color);
+  padding: 0.2rem 0.5rem;
+  background-color: var(--p-surface-100);
+  border-radius: 4px;
+
+  i {
+    font-size: 0.75rem;
+  }
 }

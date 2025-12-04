@@ -121,6 +121,15 @@ p-floatlabel {
       i {
         color: var(--p-primary-color);
       }
+
+      &.last-cooked {
+        width: 100%;
+        font-weight: 500;
+        color: var(--p-primary-color);
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--p-surface-200);
+        margin-bottom: 0.25rem;
+      }
     }
   }
 

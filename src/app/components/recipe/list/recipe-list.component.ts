@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { RecipeModel } from '../../../models/recipe.model';
 import { RecipeCardComponent } from '../card/recipe-card.component';
 import { RecipeFormComponent } from '../form/recipe-form.component';
 import { RecipeFilterComponent, RecipeFilters } from '../filter/recipe-filter.component';
 import { RecipeService } from '../../../services/recipe.service';
 import { ButtonModule } from 'primeng/button';
+import { InputTextModule } from 'primeng/inputtext';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { MessageService, ConfirmationService } from 'primeng/api';
@@ -16,10 +18,12 @@ import { MessageService, ConfirmationService } from 'primeng/api';
   providers: [MessageService, ConfirmationService],
   imports: [
     CommonModule,
+    FormsModule,
     RecipeCardComponent,
     RecipeFormComponent,
     RecipeFilterComponent,
     ButtonModule,
+    InputTextModule,
     ToastModule,
     ConfirmDialogModule,
   ],
@@ -32,6 +36,7 @@ export class RecipeListComponent {
   selectedRecipe?: RecipeModel;
   isReadOnly = false;
   currentFilters: RecipeFilters = {
+    name: '',
     seasons: [],
     categories: [],
     ingredients: ['', '', '', ''],
@@ -40,6 +45,9 @@ export class RecipeListComponent {
     minPersonnes: null,
     maxPersonnes: null,
   };
+
+  // Filtre rapide
+  quickFilter = '';
 
   constructor(
     private recipeService: RecipeService,
@@ -59,6 +67,31 @@ export class RecipeListComponent {
    */
   private applyFilters(recipes: RecipeModel[]): RecipeModel[] {
     return recipes.filter((recipe) => {
+      // Filtre rapide (recherche dans tous les textes)
+      if (this.quickFilter.trim() !== '') {
+        const searchTerm = this.quickFilter.toLowerCase().trim();
+        const searchableText = [
+          recipe.title,
+          recipe.description,
+          ...(recipe.ingredients || []).map((i) => i.name),
+          ...(recipe.season || []),
+          ...(recipe.category || []),
+        ]
+          .filter(Boolean)
+          .join(' ')
+          .toLowerCase();
+        if (!searchableText.includes(searchTerm)) {
+          return false;
+        }
+      }
+
+      // Filtre par nom
+      if (this.currentFilters.name.trim() !== '') {
+        if (!recipe.title.toLowerCase().includes(this.currentFilters.name.toLowerCase().trim())) {
+          return false;
+        }
+      }
+
       // Filtre par saison
       if (this.currentFilters.seasons.length > 0) {
         if (!recipe.season || !recipe.season.some((s) => this.currentFilters.seasons.includes(s))) {
@@ -136,6 +169,7 @@ export class RecipeListComponent {
 
   get hasActiveFilters(): boolean {
     return (
+      this.currentFilters.name.trim() !== '' ||
       this.currentFilters.seasons.length > 0 ||
       this.currentFilters.categories.length > 0 ||
       this.currentFilters.ingredients.some((i) => i.trim() !== '') ||

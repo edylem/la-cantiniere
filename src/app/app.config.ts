@@ -14,17 +14,17 @@ import { MessageService } from 'primeng/api';
 const preset = definePreset(Aura, {
   semantic: {
     primary: {
-      50: '{lime.50}',
-      100: '{lime.100}',
-      200: '{lime.200}',
-      300: '{lime.300}',
-      400: '{lime.400}',
-      500: '{lime.500}',
-      600: '{lime.600}',
-      700: '{lime.700}',
-      800: '{lime.800}',
-      900: '{lime.900}',
-      950: '{lime.950}',
+      50: '{amber.50}',
+      100: '{amber.100}',
+      200: '{amber.200}',
+      300: '{amber.300}',
+      400: '{amber.400}',
+      500: '{amber.500}',
+      600: '{amber.600}',
+      700: '{amber.700}',
+      800: '{amber.800}',
+      900: '{amber.900}',
+      950: '{amber.950}',
     },
   },
 });

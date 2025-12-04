@@ -51,6 +51,18 @@
       ></p-inputnumber>
     </div>
 
+    <div>
+      <label for="personnesCount">Nombre de personnes</label>
+      <p-inputnumber
+        id="personnesCount"
+        [(ngModel)]="newMenuPersonnes"
+        [min]="1"
+        [max]="20"
+        [showButtons]="true"
+        class="w-full"
+      ></p-inputnumber>
+    </div>
+
     <div class="flex gap-2 justify-content-end mt-3">
       <button pButton label="Annuler" class="p-button-text" (click)="onCancelAdd()"></button>
       <button pButton label="Créer" (click)="onCreateMenu()"></button>

@@ -7,6 +7,24 @@
   background-color: #f8f9fa; // Fond léger pour les images transparentes
 }
 
+// Badge pour afficher le nombre de jours depuis la dernière cuisson
+.days-badge {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background-color: var(--p-primary-color);
+  color: white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+::ng-deep .p-card {
+  position: relative;
+}
+
 .recipe-meta {
   margin-bottom: 0.5rem;
   font-weight: 600;

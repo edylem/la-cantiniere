@@ -25,6 +25,7 @@
     <div class="menus-section">
       <div class="menu-header">
         <label>Repas</label>
+        <span class="personnes-label">Pers.</span>
         <span class="cooked-label">Cuisiné</span>
       </div>
       <div class="menu-items">
@@ -32,6 +33,16 @@
         <div class="menu-row" [class.empty]="!menu.recipeId">
           <span class="menu-num">{{ menu.num }}.</span>
           <span class="menu-title flex-1">{{ getRecipeTitle(menu.recipeId) }}</span>
+          <div class="personnes-field">
+            <i class="pi pi-user"></i>
+            <p-inputnumber
+              [(ngModel)]="menu.personnes"
+              [min]="1"
+              [max]="20"
+              [showButtons]="false"
+              [inputStyle]="{ width: '2.5rem', textAlign: 'center' }"
+            ></p-inputnumber>
+          </div>
           @if (menu.recipeId) {
           <p-checkbox [(ngModel)]="menu.done" [binary]="true"></p-checkbox>
           <button
@@ -47,7 +58,7 @@
             type="button"
             icon="pi pi-eye"
             class="p-button-text p-button-sm"
-            (click)="viewRecipe(menu.recipeId)"
+            (click)="viewRecipe(menu)"
             title="Voir la recette"
           ></button>
           <button
@@ -104,33 +115,7 @@
 ></app-recipe-form>
 
 <!-- Dialog Liste de courses -->
-<p-dialog
+<app-shopping-list
   [(visible)]="showShoppingDialog"
-  [modal]="true"
-  [style]="{ width: '400px', maxHeight: '80vh' }"
-  header="Liste de courses"
-  [dismissableMask]="true"
->
-  @if (shoppingList.length === 0) {
-  <p class="text-center text-color-secondary">Aucun ingrédient dans le menu</p>
-  } @else {
-  <div class="shopping-list">
-    @for (item of shoppingList; track item.name + item.unit) {
-    <div class="shopping-item">
-      <span class="item-name">{{ item.name }}</span>
-      <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
-    </div>
-    }
-  </div>
-  <div class="mt-3 pt-3 border-top-1 surface-border">
-    <button
-      pButton
-      type="button"
-      label="Copier dans le presse-papier"
-      icon="pi pi-copy"
-      class="w-full"
-      (click)="copyShoppingListToClipboard()"
-    ></button>
-  </div>
-  }
-</p-dialog>
+  [menuGroup]="editedMenuGroup"
+></app-shopping-list>

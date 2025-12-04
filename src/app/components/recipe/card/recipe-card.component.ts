@@ -89,6 +89,37 @@ export class RecipeCardComponent {
   }
 
   /**
+   * Calcule le nombre de jours depuis la dernière fois que la recette a été cuisinée
+   * @returns Le nombre de jours ou null si jamais cuisinée
+   */
+  getDaysSinceLastCooked(): number | null {
+    const menuGroups = this.menuService.getMenuGroups();
+    let lastCookedDate: Date | null = null;
+
+    for (const group of menuGroups) {
+      for (const menu of group.menus) {
+        if (menu.recipeId === this.recipe.id && menu.done) {
+          const menuDate = new Date(group.date);
+          if (!lastCookedDate || menuDate > lastCookedDate) {
+            lastCookedDate = menuDate;
+          }
+        }
+      }
+    }
+
+    if (!lastCookedDate) {
+      return null;
+    }
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    lastCookedDate.setHours(0, 0, 0, 0);
+    const diffTime = today.getTime() - lastCookedDate.getTime();
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays * -1 - 1;
+  }
+
+  /**
    * Envoie la recette au dernier menu
    */
   onSendToMenu(): void {

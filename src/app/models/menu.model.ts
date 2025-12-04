@@ -8,6 +8,8 @@ export interface MenuModel {
   recipeId: string;
   /** Indique si l'élément a été réalisé */
   done: boolean;
+  /** Nombre de personnes pour ce repas */
+  personnes: number;
 }
 
 /**

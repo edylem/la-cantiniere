@@ -14,12 +14,14 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { InputNumberModule } from 'primeng/inputnumber';
 import { ConfirmationService } from 'primeng/api';
 import { MenuGroupModel, MenuModel } from '../../../models/menu.model';
 import { RecipeModel } from '../../../models/recipe.model';
 import { RecipeService } from '../../../services/recipe.service';
-import { MenuService, ShoppingItem } from '../../../services/menu.service';
+import { MenuService } from '../../../services/menu.service';
 import { RecipeFormComponent } from '../../recipe/form/recipe-form.component';
+import { ShoppingListComponent } from '../../shopping-list/shopping-list.component';
 
 @Component({
   selector: 'app-menu-form',
@@ -32,8 +34,10 @@ import { RecipeFormComponent } from '../../recipe/form/recipe-form.component';
     ButtonModule,
     CheckboxModule,
     DatePickerModule,
+    InputNumberModule,
     RecipeFormComponent,
     ConfirmDialogModule,
+    ShoppingListComponent,
   ],
   templateUrl: './menu-form.component.html',
   styleUrls: ['./menu-form.component.scss'],
@@ -54,7 +58,6 @@ export class MenuFormComponent implements OnInit, OnChanges {
 
   // Pour la liste de courses
   showShoppingDialog = false;
-  shoppingList: ShoppingItem[] = [];
 
   constructor(
     private recipeService: RecipeService,
@@ -78,7 +81,10 @@ export class MenuFormComponent implements OnInit, OnChanges {
     this.editedMenuGroup = {
       ...this.menuGroup,
       date: new Date(this.menuGroup.date),
-      menus: this.menuGroup.menus.map((m) => ({ ...m })),
+      menus: this.menuGroup.menus.map((m) => ({
+        ...m,
+        personnes: m.personnes || 4, // Valeur par défaut si non défini
+      })),
     };
     console.log('[MenuForm] editedMenuGroup initialisé:', this.editedMenuGroup);
   }
@@ -149,11 +155,13 @@ export class MenuFormComponent implements OnInit, OnChanges {
   }
 
   /**
-   * Affiche la recette dans un dialog
+   * Affiche la recette dans un dialog, adaptée au nombre de personnes du menu
    */
-  viewRecipe(recipeId: string): void {
-    this.selectedRecipe = this.recipes.find((r) => r.id === recipeId);
-    if (this.selectedRecipe) {
+  viewRecipe(menu: MenuModel): void {
+    const recipe = this.recipes.find((r) => r.id === menu.recipeId);
+    if (recipe) {
+      // Adapter la recette au nombre de personnes du menu
+      this.selectedRecipe = this.menuService.getRecipeForPersonnes(recipe, menu.personnes || 4);
       this.showRecipeDialog = true;
     }
   }
@@ -197,21 +205,6 @@ export class MenuFormComponent implements OnInit, OnChanges {
    * Ouvre le dialog de la liste de courses
    */
   openShoppingList(): void {
-    this.shoppingList = this.menuService.generateShoppingList(this.editedMenuGroup);
     this.showShoppingDialog = true;
-  }
-
-  /**
-   * Copie la liste de courses dans le presse-papier
-   */
-  copyShoppingListToClipboard(): void {
-    const text = this.shoppingList
-      .map((item) => `${item.name}: ${item.quantity} ${item.unit}`)
-      .join('\n');
-
-    navigator.clipboard.writeText(text).then(() => {
-      // Fermer le dialog après copie (optionnel)
-      this.showShoppingDialog = false;
-    });
   }
 }

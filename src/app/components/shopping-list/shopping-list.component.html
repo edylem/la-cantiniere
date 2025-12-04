@@ -1,0 +1,32 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [modal]="true"
+  [style]="{ width: '400px', maxHeight: '80vh' }"
+  header="Liste de courses"
+  [dismissableMask]="true"
+>
+  @if (shoppingList.length === 0) {
+  <p class="text-center text-color-secondary">Aucun ingrédient à acheter</p>
+  <p class="text-center text-color-secondary text-sm">(Tous les repas sont déjà cuisinés)</p>
+  } @else {
+  <div class="shopping-list">
+    @for (item of shoppingList; track item.name + item.unit) {
+    <div class="shopping-item">
+      <span class="item-name">{{ item.name }}</span>
+      <span class="item-quantity">{{ item.quantity }} {{ item.unit }}</span>
+    </div>
+    }
+  </div>
+  <div class="mt-3 pt-3 border-top-1 surface-border">
+    <button
+      pButton
+      type="button"
+      label="Copier dans le presse-papier"
+      icon="pi pi-copy"
+      class="w-full"
+      (click)="copyToClipboard()"
+    ></button>
+  </div>
+  }
+</p-dialog>

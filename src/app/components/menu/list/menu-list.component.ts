@@ -28,16 +28,20 @@ export class MenuListComponent {
   showAddDialog = false;
   newMenuDate: Date = new Date();
   newMenuMealsCount: number = 7;
+  newMenuPersonnes: number = 4;
 
   constructor(private menuService: MenuService) {}
 
   /**
-   * Récupère les groupes de menus triés par date décroissante
+   * Récupère les 10 derniers groupes de menus triés par date décroissante
    */
   get menuGroups(): MenuGroupModel[] {
-    return this.menuService.getMenuGroups().sort((a, b) => {
-      return new Date(b.date).getTime() - new Date(a.date).getTime();
-    });
+    return this.menuService
+      .getMenuGroups()
+      .sort((a, b) => {
+        return new Date(b.date).getTime() - new Date(a.date).getTime();
+      })
+      .slice(0, 10);
   }
 
   /**
@@ -52,7 +56,8 @@ export class MenuListComponent {
    */
   onAddMenu(): void {
     this.newMenuDate = new Date();
-    this.newMenuMealsCount = 7;
+    this.newMenuMealsCount = 4;
+    this.newMenuPersonnes = 4;
     this.showAddDialog = true;
   }
 
@@ -74,6 +79,7 @@ export class MenuListComponent {
         num: i,
         recipeId: suggestedRecipeIds[i - 1] || '',
         done: false,
+        personnes: this.newMenuPersonnes,
       });
     }
 

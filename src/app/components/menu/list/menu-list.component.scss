@@ -2,16 +2,32 @@
   padding: 1rem;
   max-width: 800px;
   margin: 0 auto;
+  background: linear-gradient(135deg, var(--p-surface-50) 0%, var(--p-surface-100) 100%);
+  min-height: calc(100vh - 60px);
 
   .header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: var(--p-primary-color);
+    border-radius: 8px;
+    color: white;
 
     h2 {
       margin: 0;
+      color: white;
+    }
+
+    button {
+      background-color: white;
       color: var(--p-primary-color);
+      border: none;
+
+      &:hover {
+        background-color: var(--p-surface-100);
+      }
     }
   }
 }
@@ -30,10 +46,15 @@
   padding: 3rem;
   text-align: center;
   color: var(--p-text-muted-color);
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
   i {
     font-size: 3rem;
     margin-bottom: 1rem;
+    color: var(--p-primary-color);
+    opacity: 0.5;
   }
 
   p {

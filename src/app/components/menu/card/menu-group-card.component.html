@@ -6,6 +6,14 @@
         <button
           pButton
           type="button"
+          icon="pi pi-shopping-cart"
+          class="p-button-text p-button-sm"
+          (click)="showShoppingDialog = true"
+          title="Liste de courses"
+        ></button>
+        <button
+          pButton
+          type="button"
           icon="pi pi-pencil"
           class="p-button-text p-button-sm"
           (click)="onEdit()"
@@ -27,11 +35,33 @@
     <div class="menu-item" [class.done]="menu.done">
       <span class="menu-num">{{ menu.num }}.</span>
       <span class="menu-title">{{ getRecipeTitle(menu.recipeId) }}</span>
+      <span class="menu-personnes" [title]="(menu.personnes || 4) + ' personnes'">
+        <i class="pi pi-user"></i>
+        {{ menu.personnes || 4 }}
+      </span>
+      @if (menu.recipeId) {
+      <button
+        pButton
+        type="button"
+        icon="pi pi-eye"
+        class="p-button-text p-button-sm p-button-rounded"
+        (click)="viewRecipe(menu)"
+        title="Voir la recette"
+      ></button>
+      }
     </div>
     }
   </div>
 </p-card>
 
 <app-menu-form [(visible)]="showEditDialog" [menuGroup]="menuGroup"></app-menu-form>
+
+<app-shopping-list [(visible)]="showShoppingDialog" [menuGroup]="menuGroup"></app-shopping-list>
+
+<app-recipe-form
+  [(visible)]="showRecipeDialog"
+  [recipe]="selectedRecipe"
+  [isReadOnly]="true"
+></app-recipe-form>
 
 <p-confirmDialog></p-confirmDialog>

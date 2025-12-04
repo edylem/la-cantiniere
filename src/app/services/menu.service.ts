@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { MenuGroupModel, MenuModel } from '../models/menu.model';
-import { IngredientModel } from '../models/ingredient.model';
+import { RecipeModel } from '../models/recipe.model';
 import { FirestoreService } from './firestore.service';
 import { RecipeService } from './recipe.service';
 
@@ -278,6 +278,7 @@ export class MenuService {
   /**
    * Génère la liste de courses pour un groupe de menus
    * Additionne les quantités des ingrédients identiques (même nom + même unité)
+   * Adapte les quantités au nombre de personnes de chaque menu
    * @param menuGroup Le groupe de menus
    * @returns Liste de courses agrégée
    */
@@ -292,8 +293,11 @@ export class MenuService {
       const recipe = recipes.find((r) => r.id === menu.recipeId);
       if (!recipe) continue;
 
-      // Parcourir tous les ingrédients de la recette
-      for (const ingredient of recipe.ingredients) {
+      // Adapter la recette au nombre de personnes du menu
+      const adaptedRecipe = this.getRecipeForPersonnes(recipe, menu.personnes || 4);
+
+      // Parcourir tous les ingrédients de la recette adaptée
+      for (const ingredient of adaptedRecipe.ingredients) {
         // Clé unique: nom + unité (en minuscules pour éviter les doublons)
         const key = `${ingredient.name.toLowerCase()}|${ingredient.unit.toLowerCase()}`;
 
@@ -316,6 +320,26 @@ export class MenuService {
     return Array.from(itemsMap.values()).sort((a, b) =>
       a.name.toLowerCase().localeCompare(b.name.toLowerCase())
     );
+  }
+
+  /**
+   * Clone une recette et adapte les quantités d'ingrédients au nombre de personnes demandé
+   * @param recipe La recette originale
+   * @param targetPersonnes Le nombre de personnes souhaité
+   * @returns Une copie de la recette avec les quantités adaptées
+   */
+  getRecipeForPersonnes(recipe: RecipeModel, targetPersonnes: number): RecipeModel {
+    const originalPersonnes = recipe.personnes || 4; // Par défaut 4 personnes
+    const ratio = targetPersonnes / originalPersonnes;
+
+    return {
+      ...recipe,
+      personnes: targetPersonnes,
+      ingredients: recipe.ingredients.map((ingredient) => ({
+        ...ingredient,
+        quantity: Math.round(ingredient.quantity * ratio * 100) / 100, // Arrondir à 2 décimales
+      })),
+    };
   }
 
   /**

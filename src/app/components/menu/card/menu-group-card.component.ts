@@ -4,15 +4,26 @@ import { CardModule } from 'primeng/card';
 import { ButtonModule } from 'primeng/button';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ConfirmationService } from 'primeng/api';
-import { MenuGroupModel } from '../../../models/menu.model';
+import { MenuGroupModel, MenuModel } from '../../../models/menu.model';
+import { RecipeModel } from '../../../models/recipe.model';
 import { RecipeService } from '../../../services/recipe.service';
 import { MenuService } from '../../../services/menu.service';
 import { MenuFormComponent } from '../form/menu-form.component';
+import { ShoppingListComponent } from '../../shopping-list/shopping-list.component';
+import { RecipeFormComponent } from '../../recipe/form/recipe-form.component';
 
 @Component({
   selector: 'app-menu-group-card',
   standalone: true,
-  imports: [CommonModule, CardModule, ButtonModule, ConfirmDialogModule, MenuFormComponent],
+  imports: [
+    CommonModule,
+    CardModule,
+    ButtonModule,
+    ConfirmDialogModule,
+    MenuFormComponent,
+    ShoppingListComponent,
+    RecipeFormComponent,
+  ],
   providers: [ConfirmationService],
   templateUrl: './menu-group-card.component.html',
   styleUrls: ['./menu-group-card.component.scss'],
@@ -20,6 +31,9 @@ import { MenuFormComponent } from '../form/menu-form.component';
 export class MenuGroupCardComponent {
   @Input() menuGroup!: MenuGroupModel;
   showEditDialog = false;
+  showShoppingDialog = false;
+  showRecipeDialog = false;
+  selectedRecipe?: RecipeModel;
 
   constructor(
     private recipeService: RecipeService,
@@ -70,5 +84,17 @@ export class MenuGroupCardComponent {
         this.menuService.delete(this.menuGroup.id).subscribe();
       },
     });
+  }
+
+  /**
+   * Affiche la recette adaptée au nombre de personnes du menu
+   */
+  viewRecipe(menu: MenuModel): void {
+    const recipes = this.recipeService.getRecipes();
+    const recipe = recipes.find((r) => r.id === menu.recipeId);
+    if (recipe) {
+      this.selectedRecipe = this.menuService.getRecipeForPersonnes(recipe, menu.personnes || 4);
+      this.showRecipeDialog = true;
+    }
   }
 }

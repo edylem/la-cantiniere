@@ -10,6 +10,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ImageService } from '../../../services/image.service';
+import { MenuService } from '../../../services/menu.service';
 import { RecipeModel, ALL_SEASONS, ALL_CATEGORIES } from '../../../models/recipe.model';
 import { IngredientModel } from '../../../models/ingredient.model';
 import { InputText } from 'primeng/inputtext';
@@ -51,7 +52,11 @@ export class RecipeFormComponent implements OnInit, OnChanges {
   seasons = ALL_SEASONS.map((s) => ({ label: s, value: s }));
   categories = ALL_CATEGORIES.map((c) => ({ label: c, value: c }));
 
-  constructor(private fb: FormBuilder, private imageService: ImageService) {}
+  constructor(
+    private fb: FormBuilder,
+    private imageService: ImageService,
+    private menuService: MenuService
+  ) {}
 
   ngOnInit(): void {
     this.initForm();
@@ -152,6 +157,34 @@ export class RecipeFormComponent implements OnInit, OnChanges {
         this.recipeForm.patchValue({ image: base64 });
       });
     }
+  }
+
+  /**
+   * Récupère la date de dernière cuisson de la recette
+   * @returns La date formatée ou null si jamais cuisinée
+   */
+  getLastCookedDate(): string | null {
+    if (!this.recipe) return null;
+
+    const menuGroups = this.menuService.getMenuGroups();
+    let lastCookedDate: Date | null = null;
+
+    for (const group of menuGroups) {
+      for (const menu of group.menus) {
+        if (menu.recipeId === this.recipe.id && menu.done) {
+          const menuDate = new Date(group.date);
+          if (!lastCookedDate || menuDate > lastCookedDate) {
+            lastCookedDate = menuDate;
+          }
+        }
+      }
+    }
+
+    if (!lastCookedDate) {
+      return null;
+    }
+
+    return lastCookedDate.toLocaleDateString('fr-FR');
   }
 
   get isEditMode(): boolean {

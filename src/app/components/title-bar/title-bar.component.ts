@@ -35,14 +35,14 @@ export class TitleBarComponent {
       separator: true,
     },
     {
-      label: 'Exporter (JSON)',
+      label: 'Importer (JSON)',
       icon: 'pi pi-download',
-      command: () => this.onDownload(),
+      command: () => this.onImport(),
     },
     {
-      label: 'Importer (JSON)',
+      label: 'Exporter (JSON)',
       icon: 'pi pi-upload',
-      command: () => this.onImport(),
+      command: () => this.onDownload(),
     },
   ];
 

@@ -6,6 +6,7 @@
   position: sticky;
   top: 0;
   z-index: 1000;
+
   button {
     position: absolute;
     right: 0;
@@ -18,7 +19,7 @@
   font-weight: 600;
 }
 
-.burger-button {
+.action-button {
   color: white !important;
   font-size: 1.2rem;
 

@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { ALL_SEASONS, ALL_CATEGORIES } from '../../../models/recipe.model';
 
 export interface RecipeFilters {
+  name: string;
   seasons: string[];
   categories: string[];
   ingredients: string[];
@@ -36,6 +37,7 @@ export interface RecipeFilters {
 export class RecipeFilterComponent implements OnChanges {
   @Input() visible = false;
   @Input() initialFilters: RecipeFilters = {
+    name: '',
     seasons: [],
     categories: [],
     ingredients: ['', '', '', ''],
@@ -48,6 +50,7 @@ export class RecipeFilterComponent implements OnChanges {
   @Output() filtersChange = new EventEmitter<RecipeFilters>();
 
   filters: RecipeFilters = {
+    name: '',
     seasons: [],
     categories: [],
     ingredients: ['', '', '', ''],
@@ -65,6 +68,7 @@ export class RecipeFilterComponent implements OnChanges {
     if (this.visible) {
       this.filters = {
         ...this.initialFilters,
+        name: this.initialFilters.name,
         seasons: [...this.initialFilters.seasons],
         categories: [...this.initialFilters.categories],
         ingredients: [...this.initialFilters.ingredients],
@@ -87,6 +91,7 @@ export class RecipeFilterComponent implements OnChanges {
 
   onReset(): void {
     this.filters = {
+      name: '',
       seasons: [],
       categories: [],
       ingredients: ['', '', '', ''],
