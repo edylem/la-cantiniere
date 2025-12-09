@@ -58,10 +58,11 @@
 
 <app-shopping-list [(visible)]="showShoppingDialog" [menuGroup]="menuGroup"></app-shopping-list>
 
+@if(showRecipeDialog){
 <app-recipe-form
   [(visible)]="showRecipeDialog"
   [recipe]="selectedRecipe"
   [isReadOnly]="true"
 ></app-recipe-form>
-
+}
 <p-confirmDialog></p-confirmDialog>

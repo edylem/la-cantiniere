@@ -36,6 +36,7 @@
   </div>
 </div>
 
+@if(showFormDialog){
 <app-recipe-form
   [recipe]="selectedRecipe"
   [isReadOnly]="isReadOnly"
@@ -44,10 +45,11 @@
   (save)="onSaveRecipe($event)"
   (cancel)="onCancelForm()"
 ></app-recipe-form>
-
+} @if(showFilterDialog){
 <app-recipe-filter
   [visible]="showFilterDialog"
   [initialFilters]="currentFilters"
   (visibleChange)="showFilterDialog = $event"
   (filtersChange)="onFiltersChange($event)"
 ></app-recipe-filter>
+}
