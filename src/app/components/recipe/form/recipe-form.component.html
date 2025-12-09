@@ -115,24 +115,28 @@
               [formGroupName]="i"
               class="ingredient-row"
             >
-              <input
-                pInputText
+              <p-autocomplete
                 formControlName="name"
+                [suggestions]="filteredIngredients"
+                (completeMethod)="filterIngredients($event)"
                 placeholder="Nom *"
                 class="ingredient-name"
-              />
+                [appendTo]="'body'"
+              ></p-autocomplete>
               <p-inputnumber
                 formControlName="quantity"
                 [min]="0"
                 placeholder="Qté"
                 class="ingredient-qty"
               ></p-inputnumber>
-              <input
-                pInputText
+              <p-autocomplete
                 formControlName="unit"
+                [suggestions]="filteredUnits"
+                (completeMethod)="filterUnits($event)"
                 placeholder="Unité"
                 class="ingredient-unit"
-              />
+                [appendTo]="'body'"
+              ></p-autocomplete>
               <p-button
                 type="button"
                 icon="pi pi-trash"

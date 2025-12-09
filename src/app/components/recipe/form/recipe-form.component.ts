@@ -1,26 +1,27 @@
+import { CommonModule } from '@angular/common';
 import {
   Component,
   EventEmitter,
   Input,
+  OnChanges,
   OnInit,
   Output,
-  OnChanges,
   SimpleChanges,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ImageService } from '../../../services/image.service';
-import { MenuService } from '../../../services/menu.service';
-import { RecipeModel, ALL_SEASONS, ALL_CATEGORIES } from '../../../models/recipe.model';
-import { IngredientModel } from '../../../models/ingredient.model';
-import { InputText } from 'primeng/inputtext';
-import { Textarea } from 'primeng/textarea';
-import { InputNumber } from 'primeng/inputnumber';
-import { MultiSelect } from 'primeng/multiselect';
+import { AutoComplete } from 'primeng/autocomplete';
 import { Button } from 'primeng/button';
-import { Card } from 'primeng/card';
 import { Dialog } from 'primeng/dialog';
 import { Fieldset } from 'primeng/fieldset';
+import { InputNumber } from 'primeng/inputnumber';
+import { InputText } from 'primeng/inputtext';
+import { MultiSelect } from 'primeng/multiselect';
+import { Textarea } from 'primeng/textarea';
+import { IngredientModel } from '../../../models/ingredient.model';
+import { ALL_CATEGORIES, ALL_SEASONS, RecipeModel } from '../../../models/recipe.model';
+import { ImageService } from '../../../services/image.service';
+import { IngredientService } from '../../../services/ingredient.service';
+import { MenuService } from '../../../services/menu.service';
 
 @Component({
   selector: 'app-recipe-form',
@@ -33,9 +34,9 @@ import { Fieldset } from 'primeng/fieldset';
     InputNumber,
     MultiSelect,
     Button,
-    Card,
     Dialog,
     Fieldset,
+    AutoComplete,
   ],
   templateUrl: './recipe-form.component.html',
   styleUrls: ['./recipe-form.component.scss'],
@@ -64,6 +65,10 @@ export class RecipeFormComponent implements OnInit, OnChanges {
   seasons = ALL_SEASONS.map((s) => ({ label: s, value: s }));
   categories = ALL_CATEGORIES.map((c) => ({ label: c, value: c }));
 
+  // Suggestions pour l'autocomplétion
+  filteredIngredients: string[] = [];
+  filteredUnits: string[] = [];
+
   get recipe(): RecipeModel | undefined {
     return this.#recipe;
   }
@@ -74,7 +79,8 @@ export class RecipeFormComponent implements OnInit, OnChanges {
   constructor(
     private fb: FormBuilder,
     private imageService: ImageService,
-    private menuService: MenuService
+    private menuService: MenuService,
+    private ingredientService: IngredientService
   ) {}
 
   ngOnInit(): void {
@@ -122,6 +128,26 @@ export class RecipeFormComponent implements OnInit, OnChanges {
 
   removeIngredient(index: number): void {
     this.ingredients.removeAt(index);
+  }
+
+  /**
+   * Filtre les ingrédients pour l'autocomplétion
+   */
+  filterIngredients(event: { query: string }): void {
+    const query = event.query.toLowerCase();
+    this.filteredIngredients = this.ingredientService
+      .getIngredients()
+      .filter((ing) => ing.toLowerCase().includes(query));
+  }
+
+  /**
+   * Filtre les unités pour l'autocomplétion
+   */
+  filterUnits(event: { query: string }): void {
+    const query = event.query.toLowerCase();
+    this.filteredUnits = this.ingredientService
+      .getUnits()
+      .filter((unit) => unit.toLowerCase().includes(query));
   }
 
   private loadRecipe(recipe?: RecipeModel): void {

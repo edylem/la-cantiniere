@@ -14,6 +14,19 @@
     animation: fadeOut 0.5s ease-out forwards;
   }
 
+  .splash-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .splash-logo {
+    width: 240px;
+    height: 240px;
+    filter: brightness(0) invert(1); // Rend le logo blanc
+  }
+
   h1 {
     font-size: 4rem;
     color: white;
