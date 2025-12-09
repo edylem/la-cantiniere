@@ -6,10 +6,14 @@ export type Season = (typeof ALL_SEASONS)[number];
 
 // Catégories de recettes
 export const ALL_CATEGORIES = [
+  'Apéro',
+  'Gâteau',
+  'Pour Emilie',
   'Que pour les parents',
-  'Repas Gourmand',
-  'Pour les grandes occasions',
+  'Quotidien',
+  'Réception',
   'Recette rapide',
+  'Repas Gourmand',
 ] as const;
 export type Category = (typeof ALL_CATEGORIES)[number];
 

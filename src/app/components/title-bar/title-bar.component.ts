@@ -24,12 +24,12 @@ export class TitleBarComponent {
     {
       label: 'Recettes',
       icon: 'pi pi-book',
-      command: () => this.router.navigate(['/recipes']),
+      command: () => this.router.navigate(['/'], { skipLocationChange: true }),
     },
     {
       label: 'Idées de Repas',
       icon: 'pi pi-calendar',
-      command: () => this.router.navigate(['/menus']),
+      command: () => this.router.navigate(['/menus'], { skipLocationChange: true }),
     },
     {
       separator: true,

@@ -58,7 +58,7 @@
 
 <app-shopping-list [(visible)]="showShoppingDialog" [menuGroup]="menuGroup"></app-shopping-list>
 
-@if(showRecipeDialog){
+@if(showRecipeDialog && selectedRecipe){
 <app-recipe-form
   [(visible)]="showRecipeDialog"
   [recipe]="selectedRecipe"

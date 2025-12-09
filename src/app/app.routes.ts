@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [
   {
-    path: 'recipes',
+    path: '',
     loadComponent: () =>
       import('./components/recipe/list/recipe-list.component').then((m) => m.RecipeListComponent),
   },
@@ -10,10 +10,5 @@ export const routes: Routes = [
     path: 'menus',
     loadComponent: () =>
       import('./components/menu/list/menu-list.component').then((m) => m.MenuListComponent),
-  },
-  {
-    path: '',
-    redirectTo: '/recipes',
-    pathMatch: 'full',
   },
 ];

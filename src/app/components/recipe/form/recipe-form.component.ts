@@ -41,16 +41,35 @@ import { Fieldset } from 'primeng/fieldset';
   styleUrls: ['./recipe-form.component.scss'],
 })
 export class RecipeFormComponent implements OnInit, OnChanges {
-  @Input() recipe?: RecipeModel;
+  @Input()
+  set recipe(data: RecipeModel | undefined) {
+    this.#recipe = data;
+    this.loadRecipe(this.recipe);
+  }
   @Input() isReadOnly: boolean = false;
-  @Input() visible: boolean = false;
+  @Input() set visible(value: boolean) {
+    this.#visible = value;
+    if (!this.#visible) {
+      this.#recipe = undefined;
+      this.loadRecipe(this.recipe);
+    }
+  }
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() save = new EventEmitter<RecipeModel>();
   @Output() cancel = new EventEmitter<void>();
 
+  #recipe?: RecipeModel;
+  #visible = false;
   recipeForm!: FormGroup;
   seasons = ALL_SEASONS.map((s) => ({ label: s, value: s }));
   categories = ALL_CATEGORIES.map((c) => ({ label: c, value: c }));
+
+  get recipe(): RecipeModel | undefined {
+    return this.#recipe;
+  }
+  get visible(): boolean {
+    return this.#visible;
+  }
 
   constructor(
     private fb: FormBuilder,
@@ -60,9 +79,6 @@ export class RecipeFormComponent implements OnInit, OnChanges {
 
   ngOnInit(): void {
     this.initForm();
-    if (this.recipe) {
-      this.loadRecipe(this.recipe);
-    }
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -108,20 +124,20 @@ export class RecipeFormComponent implements OnInit, OnChanges {
     this.ingredients.removeAt(index);
   }
 
-  private loadRecipe(recipe: RecipeModel): void {
+  private loadRecipe(recipe?: RecipeModel): void {
     this.recipeForm.patchValue({
-      title: recipe.title,
-      image: recipe.image || '',
-      description: recipe.description,
-      season: recipe.season || [],
-      category: recipe.category || [],
-      personnes: recipe.personnes,
-      prepTime: recipe.prepTime,
-      cost: recipe.cost,
+      title: recipe?.title,
+      image: recipe?.image || '',
+      description: recipe?.description,
+      season: recipe?.season || [],
+      category: recipe?.category || [],
+      personnes: recipe?.personnes,
+      prepTime: recipe?.prepTime,
+      cost: recipe?.cost,
     });
-
+    this.ingredients.clear();
     // Charger les ingrédients
-    recipe.ingredients.forEach((ing) => {
+    recipe?.ingredients.forEach((ing) => {
       this.ingredients.push(this.createIngredientFormGroup(ing));
     });
   }

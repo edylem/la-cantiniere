@@ -4,7 +4,7 @@
   (visibleChange)="visibleChange.emit($event)"
   [modal]="true"
   [style]="{ width: '500px' }"
-  [header]="'Modifier les idées de recettes'"
+  [header]="'Modifier les idées de repas'"
   [dismissableMask]="true"
 >
   @if (editedMenuGroup) {
@@ -113,7 +113,6 @@
   [recipe]="selectedRecipe"
   [isReadOnly]="true"
 ></app-recipe-form>
-
 <!-- Dialog Liste de courses -->
 <app-shopping-list
   [(visible)]="showShoppingDialog"

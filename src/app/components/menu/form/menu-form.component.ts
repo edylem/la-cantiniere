@@ -142,7 +142,7 @@ export class MenuFormComponent implements OnInit, OnChanges {
   removeRecipe(menu: MenuModel): void {
     const recipeTitle = this.getRecipeTitle(menu.recipeId);
     this.confirmationService.confirm({
-      message: `Voulez-vous retirer "${recipeTitle}" des idées de recettes ?`,
+      message: `Voulez-vous retirer "${recipeTitle}" des idées de repas ?`,
       header: 'Confirmation',
       icon: 'pi pi-exclamation-triangle',
       acceptLabel: 'Oui',
